@@ -1,7 +1,5 @@
 const fs = require("fs");
 
-
-
 let mongo = require('mongodb');
 let MongoClient = mongo.MongoClient;
 let db;
@@ -32,10 +30,11 @@ MongoClient.connect("mongodb://localhost:27017/", function(err, client) {
      return;
     }
 
-})
+  })} 
+) 
 
 function readMonsterData(){//read all data from the monster JSON file.
-    fs.readFile("monsters.json", 'utf-8', function(err, content) {
+    let monstersSend = fs.readFile("monsters.json", 'utf-8', function(err, content) {
             if (err) {
               console.log(`ERROR ON ACCESS`);
               return;
@@ -48,9 +47,11 @@ function readMonsterData(){//read all data from the monster JSON file.
               console.log(monsters[0])
               console.log(monsters.length)
               
-              
+              return monsters
             }
       });
+
+      return monstersSend;
 }
 
 function main(){
@@ -58,4 +59,4 @@ function main(){
 }
 
 
-main();
+main()
