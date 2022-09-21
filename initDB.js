@@ -19,9 +19,11 @@ MongoClient.connect("mongodb://localhost:27017/", function(err, client) {
 
   db = client.db('dungeonManager');
 
-  //attempt to insert monsters to array
+  
   db.listCollections().toArray(function(err, result){
+    //INITIALIZE DB
     if(result.length == 0){
+      console.log("making db for the first time")
       db.collection("monsters").insertMany(monsters, function(err, result){
        if(err){
          throw err;
@@ -33,7 +35,33 @@ MongoClient.connect("mongodb://localhost:27017/", function(err, client) {
      return;
     }
 
-  })} 
+	 let numDroppedMonsters = 0;
+	 let toDrop = result.length;
+   //REFRESHING DB
+	 result.forEach(collection => {
+		db.collection(collection.name).drop(function(err, delOK){
+			if(err){
+				throw err;
+			}
+			
+			console.log("Dropped collection: " + collection.name);
+			numDroppedMonsters++;
+			
+			if(numDroppedMonsters == toDrop){
+				db.collection("monsters").insertMany(monsters, function(err, result){
+					if(err){
+						throw err;
+					}
+					
+					console.log(result.insertedCount + " monsters successfully added (should be 326).");
+					client.close();
+				});
+			}
+		});		
+	 });
+
+  })
+} 
 ) 
 
 function readMonsterData(){//read all data from the monster JSON file.
@@ -47,8 +75,8 @@ function readMonsterData(){//read all data from the monster JSON file.
               monsterToAdd.forEach(product=>{
                 monsters.push(product);
               })
-              console.log(monsters[0])
-              console.log(monsters.length)
+              //console.log(monsters[0])
+              //console.log(monsters.length)
               
               return monsters
             }

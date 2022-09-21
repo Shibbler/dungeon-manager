@@ -1,0 +1,13 @@
+html
+    script(src="imageHandle.js") 
+    head
+        title Image Submit
+
+
+form(method="post" enctype="multipart/form-data" action="/image")
+    p Upload only.png files please
+    p Image for Map
+    input(type="file" name="file")
+    br
+    br
+    input(type="submit" value="Submit")
