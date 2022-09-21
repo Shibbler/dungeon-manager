@@ -1,3 +1,6 @@
+//mongod --dbpath=C:\Users\Owner\Documents\GitHub\dungeon-manager\db
+
+
 const fs = require("fs");
 
 let mongo = require('mongodb');
