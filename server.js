@@ -62,6 +62,7 @@ app.post('/image',
           console.log("something went wrong")
         }
         console.log("image received")
+        uploadPictureToDB(tickingNameID);
         res.sendStatus(200)
 
       });
@@ -79,6 +80,11 @@ app.post('/image',
 //to read the HTML files
 //app.get("/orderform.js", sendOrderJs);
 //app.get("/userList.js", sendUserList);
+
+function uploadPictureToDB(picName){
+  console.log(picName)
+}
+
 
 function serveHome(req,res,next){
   res.render('acceptImage');
