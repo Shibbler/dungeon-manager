@@ -15,6 +15,7 @@ const { render } = require("pug");
 const e = require("express");
 const app = express()
 const multer = require("multer")
+const bodyParser = require('body-parser')
 
 app.listen(3000);
 console.log("Server listening on port 3000");
@@ -33,7 +34,8 @@ let store = new MongoDBStore({
 
 //TEMP SOLUTION
 const upload = multer({
-  dest: "C:\Users\Owner\Documents\GitHub\dungeon-manager\images"
+  //dest: "C:\Users\Owner\Documents\GitHub\dungeon-manager\images"
+  dest: "/Users/shibbler/Documents/GitHub/dungeon-manager/images"
   // you might also want to set some limits: https://github.com/expressjs/multer#limits
 });
 

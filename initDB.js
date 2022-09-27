@@ -1,5 +1,5 @@
 //mongod --dbpath=C:\Users\Owner\Documents\GitHub\dungeon-manager\db
-
+//mongod --dbpath=/Users/shibbler/Documents/GitHub/dungeon-manager/db
 
 const fs = require("fs");
 
