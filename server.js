@@ -7,7 +7,7 @@ let MongoClient = mongo.MongoClient;
 mongoose.connect('mongodb://localhost/dungeonManager', {useNewUrlParser: true});
 const ObjectId = require('mongodb').ObjectId;
 let db = mongoose.connection;
-let Users = db.collection("users");
+//let Users = db.collection("users");
 const fs = require("fs");
 const express = require('express')
 const session = require('express-session');
@@ -17,12 +17,16 @@ const app = express()
 const multer = require("multer")
 const bodyParser = require('body-parser')
 
-app.listen(3000);
-console.log("Server listening on port 3000");
-app.set("view engine", "pug");
+//using two view engines
+app.set('view engine', 'pug');
+app.set('view engine', 'ejs');
 
 //naming for file, temporary
 let tickingNameID = 0;
+
+//define schema for images
+var imgModel = require('./schemas/imageModel');
+
 
 //define the store for mongo stored session data
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -32,13 +36,16 @@ let store = new MongoDBStore({
   });
 
 
-//TEMP SOLUTION
-const upload = multer({
-  //dest: "C:\Users\Owner\Documents\GitHub\dungeon-manager\images"
-  dest: "/Users/shibbler/Documents/GitHub/dungeon-manager/images"
-  // you might also want to set some limits: https://github.com/expressjs/multer#limits
+var storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'uploads')
+  },
+  filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now())
+  }
 });
 
+var upload = multer({ storage: storage });
 
 //define session and other values
 app.use(session({ secret: 'some secret here',store: store}))
@@ -48,80 +55,80 @@ app.use(express.urlencoded({extended: true}));
 
 //define gateways
 app.get('/', serveHome);
+app.get('/images',serveImagesPage)
+app.get('/monsters', findMonsters)
+app.post('/images',upload.single('image'),uploadPictureToDB)
 
-app.post('/image',
-  //credit https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express
-  upload.single("file"),(req, res) => {
-    const tempPath = req.file.path;
-    console.log(tempPath)
-    const targetPath = path.join(__dirname, `./images/${tickingNameID}.png`);
-    console.log(targetPath)
-    tickingNameID++;
-
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
-      fs.rename(tempPath, targetPath, err => {
-        if (err){
-          console.log("something went wrong")
-        }
-        console.log("image received")
-        uploadPictureToDB(tickingNameID);
-        res.sendStatus(200)
-
-      });
-    }
-    //issue with upload CURRENTLY NOT A PNG FILE
-    else {
-      fs.unlink(tempPath, err => {
-        if (err) return handleError(err, res);
-
-        res.status(403).contentType("text/plain").end("Only .png files are allowed!");
-      });
-    }
-  });
 
 //to read the HTML files
 //app.get("/orderform.js", sendOrderJs);
 //app.get("/userList.js", sendUserList);
 
-function uploadPictureToDB(picName){
-  console.log(picName)
+function uploadPictureToDB(req,res,next){
+  console.log("picture upload")
+  //create the image to upload
+  fileName = path.join(__dirname + '/uploads/' + req.file.filename)
+  var obj = {
+    name: req.body.name,
+    desc: req.body.desc,
+    img: {
+        data: fs.readFileSync(fileName),
+        contentType: 'image/png'
+    }
+  }
+  //upload the image to mongoose by using the schema.create feature
+  imgModel.create(obj, (err, item) => {
+    if (err) {
+        console.log(err);
+    }
+    else {
+        //delete the file so it only stored on mongo
+        fs.unlinkSync(fileName)
+        res.redirect('/images');
+    }
+  })
 }
 
 
 function serveHome(req,res,next){
-  res.render('acceptImage');
+  res.render('home.pug');
 }
 
-function receiveImage(req,res,next){
-  console.log("image post")
-  //credit https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express
-  upload.single("file"),(req, res) => {
-    const tempPath = req.file.path;
-    console.log(tempPath)
-    const targetPath = path.join(__dirname, "./images/image.png");
-    console.log(targetPath)
+function findMonsters(req,res,next){
+  //looking for one specific monster
 
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {
-      fs.rename(tempPath, targetPath, err => {
-        if (err){
-          console.log("something went wrong")
-        }
-        console.log("image received")
-        res.sendStatus(200)
-
-      });
-    }
-    //issue with upload CURRENTLY NOT A PNG FILE
-    else {
-      fs.unlink(tempPath, err => {
-        if (err) return handleError(err, res);
-
-        res.status(403).contentType("text/plain").end("Only .png files are allowed!");
-      });
-    }
+  //should change this to build a massive query. Will update later.
+  if (req.body.id){
+    console.log('I should only find one monster')
   }
-  console.log("end step")
+  //find all monsters
+  else{
+    db.collection('monsters').find().toArray(function(err,result){
+      if (err || result == null){
+        console.log('Something went wrong')
+      }
+      else{
+        res.render("monsterView.pug",{monsters:result})
+      }
+    })
+  }
 }
+
+
+function serveImagesPage(req,res,next){
+  console.log("here")
+    imgModel.find({}, (err, items) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send('An error occurred', err);
+        }
+        else {
+            console.log("here!")
+            res.render('imagesPage.ejs', { items: items });
+        }
+    })
+}
+
 
 function serveImageUpload(req,res,next){
 
@@ -134,3 +141,7 @@ function serveImageUpload(req,res,next){
 	});
 
 }
+
+
+app.listen(3000);
+console.log("Server listening on port 3000");
