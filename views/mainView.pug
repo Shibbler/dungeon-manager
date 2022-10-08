@@ -1,0 +1,40 @@
+html
+link(rel='stylesheet', href='style.css')  
+script(src="dungeonViewer.js") 
+head
+    title welcome home
+
+h1 Upload Images
+hr
+a(href='/') Home
+br
+a(href='/images') Image Upload
+br
+br
+body(onload="init()")
+    <div id = "mainViewcontainer" class="container">
+        <div class="roomsDisplay">
+            p rooms
+        </div>
+        <div id= "monsterDisplay" class="monsterDisplay" ondrop= "drop(event)" ondragover= "allowDrop(event)">
+            div#roomStats
+
+        </div>
+        <div id="vaultDisplay" class="vaultDisplay" ondrop= "dropVault(event)" ondragover= "allowDrop(event)">
+            h1 Vault
+            h2 Search for Monsters:
+            p Monster Name:
+                br
+                input#monsterNameSearch(type="textbox")
+                br
+            p Monster Challenge Rating (=)
+                br
+                input#monsterChallengeSearch(type="textbox")
+                br
+            button#searchButton(type="button" onclick="searchVault()") Search
+            h2 Monsters: 
+            div#monstersInVault
+        </div>
+        <div class="currentMapDisplay">
+            p currentMap</div>
+    </div>

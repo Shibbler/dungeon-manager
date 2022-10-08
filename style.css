@@ -1,0 +1,64 @@
+.container {  display: grid;
+    grid-template-columns: 0.6fr 1.4fr 1fr;
+    grid-template-rows: 4em 1.2fr 0.8fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      ". . ."
+      "roomsDisplay currentMapDisplay vaultDisplay"
+      "roomsDisplay monsterDisplay vaultDisplay";
+  }
+  
+  .roomsDisplay {
+    grid-area: roomsDisplay;
+    height: 650px;
+    overflow:scroll; 
+  
+  }
+  
+  .monsterDisplay {
+    grid-area: monsterDisplay;
+    overflow:scroll;
+  
+  }
+  
+  .vaultDisplay { 
+    grid-area: vaultDisplay;
+    height: 650px;
+    overflow:scroll;
+                  
+  }
+  
+  .currentMapDisplay { grid-area: currentMapDisplay; }
+
+  .column {
+    float: left;
+  }
+
+  .left{
+    width: 10%;
+  }
+  
+  .right {
+    width: 25%;
+  }
+
+  .middle {
+    width: 65%;
+  }
+
+
+/*
+  li{color: #C38d9e}
+  ul{color: #C38d9e}
+
+  body {
+    margin: 0;
+    color: #E27d60;
+    background: #Cafafe;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+      sans-serif;
+    
+  }
+  */

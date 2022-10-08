@@ -26,6 +26,7 @@ let tickingNameID = 0;
 
 //define schema for images
 var imgModel = require('./schemas/imageModel');
+const { query } = require('express');
 
 
 //define the store for mongo stored session data
@@ -47,6 +48,8 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
+let Monsters = db.collection('monsters')
+
 //define session and other values
 app.use(session({ secret: 'some secret here',store: store}))
 app.use(express.static("public"));
@@ -56,7 +59,10 @@ app.use(express.urlencoded({extended: true}));
 //define gateways
 app.get('/', serveHome);
 app.get('/images',serveImagesPage)
+app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
+app.get("/style.css",sendCSS)
+app.get("/dungeonViewer.js",serveDungeonViewer)
 app.post('/images',upload.single('image'),uploadPictureToDB)
 
 
@@ -96,22 +102,54 @@ function serveHome(req,res,next){
 
 function findMonsters(req,res,next){
   //looking for one specific monster
-
   //should change this to build a massive query. Will update later.
+  let htmlToSend = ``;
   if (req.body.id){
     console.log('I should only find one monster')
   }
+  else if (req.query.monsterName || req.query.cr){
+    console.log(req.query.monsterName)
+    //build query
+    let queryToSearch = {};
+    if (req.query.monsterName){
+      queryToSearch.name = {$regex : req.query.monsterName, $options: 'i'}
+    }
+    if (req.query.cr){
+      queryToSearch.challenge_rating = req.query.cr
+    }
+    console.log(queryToSearch)
+  
+    Monsters.find(queryToSearch).toArray(function(err,results){
+      if (err){console.log(err)}
+      //let htmlToSend = ``;
+      for (i = 0; i < results.length; i++){
+        monster = results[i];
+        htmlToSend += `<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+      }
+      res.status(200).send(htmlToSend);
+     
+    })
+  }
   //find all monsters
   else{
-    db.collection('monsters').find().toArray(function(err,result){
-      if (err || result == null){
+    db.collection('monsters').find().toArray(function(err,results){
+      if (err || results == null){
         console.log('Something went wrong')
       }
       else{
-        res.render("monsterView.pug",{monsters:result})
+       // console.log("I will send some html now")
+        for (i = 0; i < results.length; i++){
+          monster = results[i];
+          htmlToSend += `<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+        }
+        res.status(200).send(htmlToSend)
       }
     })
   }
+}
+
+function serveMainViewer(req,res,next){
+  res.render('mainView.pug')
 }
 
 
@@ -130,9 +168,9 @@ function serveImagesPage(req,res,next){
 }
 
 
-function serveImageUpload(req,res,next){
+function serveDungeonViewer(req,res,next){
 
-  fs.readFile("imageUpload.js", function(err, data){
+  fs.readFile("dungeonViewer.js", function(err, data){
 		if(err){
 			res.status(500).send("Error.");
 			return;
@@ -141,6 +179,18 @@ function serveImageUpload(req,res,next){
 	});
 
 }
+
+function sendCSS(req,res,next){
+	fs.readFile("style.css", function(err, data){
+		if(err){
+			res.status(500).send("Error.");
+			return;
+		}
+    //console.log("i have sent css data")
+		res.status(200).send(data)
+	});
+}
+
 
 
 app.listen(3000);
