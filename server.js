@@ -48,7 +48,9 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-let Monsters = db.collection('monsters')
+let Monsters = db.collection('monsters');
+let Rooms = db. collection('rooms');
+let Users = db.collection('users')
 
 //define session and other values
 app.use(session({ secret: 'some secret here',store: store}))
@@ -61,9 +63,20 @@ app.get('/', serveHome);
 app.get('/images',serveImagesPage)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
+app.get('/rooms',sendRooms)
 app.get("/style.css",sendCSS)
 app.get("/dungeonViewer.js",serveDungeonViewer)
+
+//users stuff
+app.get('/register',serveRegisterPage)
+app.post('/register',register);
+app.get("/login",serveLoginPage)
+app.post("/login",login)
+app.get("/logout",logout)
+
+
 app.post('/images',upload.single('image'),uploadPictureToDB)
+app.post('/roomSave',saveRoomData)
 
 
 //to read the HTML files
@@ -95,14 +108,148 @@ function uploadPictureToDB(req,res,next){
   })
 }
 
-
-function serveHome(req,res,next){
-  res.render('home.pug');
+function sendRooms(req,res,next){
+  
 }
 
+
+function serveHome(req,res,next){
+  res.render('home.pug',{session: req.session});
+}
+
+
+function serveLoginPage(req,res,next){
+  res.render('login.pug',)
+}
+
+function serveRegisterPage(req,res,next){
+  //not allowed to register if you are logged in
+  if (req.session.loggedin){
+    res.render("home",{session: req.session})
+  }else{
+    res.render(`register.pug`);
+  }
+}
+
+function register(req,res,next){
+  let username = req.body.username.toLowerCase();
+	let password = req.body.password;
+
+  Users.findOne({"username":username}, function(err,result){
+    if (result != null){//if a user is found
+      res.render('register.pug',{error: true})
+    }else{//if the user is not currently in the db
+      //define the new user to be added
+      newUser= {
+          username: username,
+          password: password,
+          dungeons: []
+      }
+      //add the user
+      Users.insertOne(newUser,function(err,result){
+          if(err) throw err;
+          console.log("I added a new user")
+          console.log(result);
+          //log in user
+          req.session.loggedin = true;
+          req.session._id= result.insertedId;
+          console.log(req.session._id);
+          req.session.username = username;
+          res.render("home.pug",{session: req.session})
+      })
+    }
+  })
+}
+
+function login(req,res,next){
+  if(req.session.loggedin){
+    res.render("home.pug", {session: req.session})
+    return;
+  }
+
+  let username = req.body.username;
+  let password = req.body.password;
+  //console.log("Logging in with credentials:");
+  //console.log("Username: " + req.body.username);
+  //console.log("Password: " + req.body.password);
+  let currUser;
+  //try to find the user
+  Users.findOne({"username": username}, function(err, result){
+  if(err || result == null){//if the user can't be found, rerender page
+          //console.log('DIDNT FIND IT')
+          res.render("login.pug",{error: "Unauthorized. No username exists"})
+      }else{
+          //console.log('found it!')
+      currUser = result;
+          //console.log(currUser)
+          //if passwords match
+          if(currUser.password === req.body.password){
+              req.session.loggedin = true;
+              //We set the username associated with this session
+              //On future requests, we KNOW who the user is
+              //We can look up their information specifically
+              //We can authorize based on who they are
+              req.session._id= result._id
+              req.session.username = username;
+              //go to homepage once logged in
+              res.render("home.pug", {session: req.session})
+          }else{//didnt find a match for password
+              res.render("login.pug",{error:"Not authorized. Invalid password."})
+          }
+      }
+  });
+}
+
+function logout(req,res,next){
+
+  if(req.session.loggedin){
+		req.session.loggedin = false;
+    req.session.username = undefined;
+        res.render("home.pug", {session: req.session})
+	}else{
+        res.render("home.pug", {session: req.session})
+	}
+
+}
+
+
+//INCOMPLETE
+function saveRoomData(req,res,next){
+  console.log(req.body)
+  if (!req.body.roomName){
+    roomName = 'untitled'
+  }else{
+    roomName = req.body.roomName
+  }
+  let roomToSave ={
+    user: req.session.username,
+    dungeon: req.body.dungeon,
+    monsters: req.body.monsters,
+    name: roomName
+  }
+  Rooms.findOne({name: roomName, user: req.session.username}, function(err,result){
+    if (err){
+      console.log(err)
+    }
+    if(result === null){//room was not found so we need to insert it
+      Rooms.insertOne(roomToSave);
+      console.log('I saved')
+      res.status(200);
+    }
+    //room already does exist, so we need to replace/update it
+    else{
+      Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
+      console.log("I replaced")
+      res.status(200);
+    }
+
+  })
+  console.log("roomSaved")
+}
+
+
+
 function findMonsters(req,res,next){
-  //looking for one specific monster
-  //should change this to build a massive query. Will update later.
   let htmlToSend = ``;
   if (req.body.id){
     console.log('I should only find one monster')

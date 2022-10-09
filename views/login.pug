@@ -1,0 +1,14 @@
+header 
+        a(href="/")= `Home Page`
+        br
+if(error)
+    script.
+        alert(`Bad Login`);  
+form(action='/login' method="post")
+    p Username: 
+        input(type="text" name= "username" required)
+    p Password: 
+        input(type="text" name= "password" required)
+    button(type="submit") Login
+br
+a(href="/register") Register as New User

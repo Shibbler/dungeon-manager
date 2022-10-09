@@ -2,8 +2,7 @@ html
 link(rel='stylesheet', href='style.css')  
 script(src="dungeonViewer.js") 
 head
-    title welcome home
-
+    title Main View
 h1 Upload Images
 hr
 a(href='/') Home
@@ -12,6 +11,9 @@ a(href='/images') Image Upload
 br
 br
 body(onload="init()")
+    p Room Name (leave empty for untitled, will overwrite same-name files)  
+        input#roomName(type="textbox" value= "untitled")
+    button#saveRoomButton(type="button" onclick="saveRoom()") Save Room to Dungeon
     <div id = "mainViewcontainer" class="container">
         <div class="roomsDisplay">
             p rooms

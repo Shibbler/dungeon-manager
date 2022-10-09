@@ -1,8 +1,9 @@
 function init(){
 	console.log("ya got me")
     calculateRoomStats();
+    
 }
-
+let curDungeon = "TEST DUNGEON"
 
 
 function searchVault(){
@@ -104,3 +105,25 @@ function calculateRoomStats(){
     document.getElementById("roomStats").innerHTML = `<h3 id= "roomStats" totHp="${totalHp}" totCr="${totalCr}"> Current Room Stats ~ HP: ${totalHp}, CR: ${totalCr} `
 }
 
+function saveRoom(){
+
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+            //console.log(this.response)
+            //console.log(document.body)
+            //document.getElementById("monstersInVault").innerHTML=this.response;
+            console.log('saved')
+            alert('saved!')
+        }
+	}
+    let monstersInRoom = document.getElementById("monsterDisplay").getElementsByTagName("li");
+    let monstersToSave = [];
+    for (i = 0; i<monstersInRoom.length;i++){
+       monstersToSave.push(monstersInRoom[i].getAttribute("name"))
+    }
+    console.log(monstersToSave)
+    req.open("post", `/roomSave`);
+    req.setRequestHeader("Content-Type", "application/json")
+	req.send(JSON.stringify({monsters: monstersToSave, dungeon: curDungeon, roomName: document.getElementById("roomName").value}));
+}

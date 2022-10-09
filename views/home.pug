@@ -1,10 +1,24 @@
 html
 link(rel='stylesheet', href='style.css')
 head
-    title welcome home
-
-h1 Upload Images
-hr
-a(href='/images') Image Upload
-br
-a(href='/main') Main Viewer
+    title Home Page
+if (session.loggedin)
+    header
+        a(href='/images') Image Upload
+        br
+        a(href='/main') Main Viewer
+        br
+        a(href='/logout') Logout
+        br
+    body
+        h1 Welcome to home page!
+        a()=`You are logged in as username ${session.username}`
+else
+    header
+        a(href='/register') Register for Account
+        br
+        a(href='/login') Login
+        br
+    body
+        h1 Welcome to home page!
+        p You are not logged in.

@@ -1,0 +1,14 @@
+header 
+        a(href="/")= `Home Page`
+        br
+        a(href="/login")= "Login"
+        br
+if(error)
+    script.
+        alert("Account name already exists! Try another name");  
+form(action='/register' method="post")
+    p Username: 
+        input(type="text" name= "username" required)
+    p Password: 
+        input(type="text" name= "password" required)
+    button(type="submit") Register
