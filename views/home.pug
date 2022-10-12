@@ -1,12 +1,14 @@
 html
-link(rel='stylesheet', href='style.css')
+link(rel='stylesheet', href='/style.css')
 head
     title Home Page
 if (session.loggedin)
     header
         a(href='/images') Image Upload
         br
-        a(href='/main') Main Viewer
+        a(href='/main') Main Viewer DONT CLICK FROM HERE
+        br
+        a(href='/dungeons') Dungeon Selector
         br
         a(href='/logout') Logout
         br

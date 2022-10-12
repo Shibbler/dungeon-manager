@@ -1,16 +1,18 @@
 html
-link(rel='stylesheet', href='style.css')  
-script(src="dungeonViewer.js") 
+link(rel='stylesheet', href='/style.css')  
+script(src="/dungeonViewer.js") 
 head
-    title Main View
-h1 Upload Images
+    title Manage Dungeon
+h1= `Manage Dungeon: ${dungeon.name}, id: ${dungeon._id}`
 hr
 a(href='/') Home
 br
 a(href='/images') Image Upload
 br
 br
+meta(name="DungeonIDMeta" content=`${dungeon._id}`)
 body(onload="init()")
+    input#dungeonID(hidden value=`${dungeon._id}`)
     p Room Name (leave empty for untitled, will overwrite same-name files)  
         input#roomName(type="textbox" value= "untitled")
     button#saveRoomButton(type="button" onclick="saveRoom()") Save Room to Dungeon

@@ -1,0 +1,28 @@
+html
+link(rel='stylesheet', href='/style.css')  
+script(src="/dungeonSelect.js") 
+head
+    title Dungeon Selector
+a(href='/') Home
+br
+br
+hr
+h1 Select Dungeon
+
+if (noDungeon)
+    p No Dungeons found for this user. Please exit or make a new one below:
+
+
+else
+    P Dungeons:
+    for dungeon in dungeons
+        br
+        a(href=`/dungeons/${dungeon._id}` id= `${dungeon._id}`)=`Name: ${dungeon.name}, id: ${dungeon._id}`
+        br
+
+p Create a new Dungeon (same names allowed FOR NOW):
+form(action='/dungeons' method="post")
+    p Dungeon Name: 
+        input(type="text" name= "dungeonName" required)
+
+    button(type="submit") Make New Dungeon

@@ -105,6 +105,8 @@ function calculateRoomStats(){
     document.getElementById("roomStats").innerHTML = `<h3 id= "roomStats" totHp="${totalHp}" totCr="${totalCr}"> Current Room Stats ~ HP: ${totalHp}, CR: ${totalCr} `
 }
 
+
+
 function saveRoom(){
 
     let req = new XMLHttpRequest();
@@ -125,5 +127,5 @@ function saveRoom(){
     console.log(monstersToSave)
     req.open("post", `/roomSave`);
     req.setRequestHeader("Content-Type", "application/json")
-	req.send(JSON.stringify({monsters: monstersToSave, dungeon: curDungeon, roomName: document.getElementById("roomName").value}));
+	req.send(JSON.stringify({monsters: monstersToSave, dungeon: `${document.getElementById('dungeonID').value}`, roomName: document.getElementById("roomName").value}));
 }

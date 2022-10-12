@@ -28,6 +28,8 @@ let tickingNameID = 0;
 var imgModel = require('./schemas/imageModel');
 const { query } = require('express');
 
+let testDungeon = {name: 'test', _id: 'TEST ID'}
+
 
 //define the store for mongo stored session data
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -51,10 +53,11 @@ var upload = multer({ storage: storage });
 let Monsters = db.collection('monsters');
 let Rooms = db. collection('rooms');
 let Users = db.collection('users')
+let Dungeons = db.collection('dungeons');
 
 //define session and other values
 app.use(session({ secret: 'some secret here',store: store}))
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
@@ -64,8 +67,20 @@ app.get('/images',serveImagesPage)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
 app.get('/rooms',sendRooms)
+app.get('/dungeons',sendDungeons)
+
+//this is grabbing CSS and dungeonViewer.js for some reason\
+//theyre
+app.get('/dungeons/:dungeonID',sendSpecificDungeon)
+app.post('/dungeons',makeNewDungeon)
+
+//gets for files
 app.get("/style.css",sendCSS)
 app.get("/dungeonViewer.js",serveDungeonViewer)
+//acount for the 'within' issues
+app.get("/dungeons/style.css",sendCSS)
+app.get("/dungeons/dungeonViewer.js",serveDungeonViewer)
+app.get("/dungeonSelect.js",serveDungeonSelect)
 
 //users stuff
 app.get('/register',serveRegisterPage)
@@ -108,9 +123,75 @@ function uploadPictureToDB(req,res,next){
   })
 }
 
+function makeNewDungeon(req,res,next){
+  let user = req.session.username;
+  console.log(req.body.dungeonName)
+  console.log(user);
+  dungeonToInsert ={
+    name: req.body.dungeonName,
+    user: user,
+    rooms: []
+  }
+  //insert the dungeon
+  Dungeons.insertOne(dungeonToInsert,function(err,result){
+    if (err){
+      console.log(err)
+      res.status(422)
+    }else{
+      console.log('dungeon added')
+      console.log(result.insertedId)
+      //add the dungeon id to the user's dungeons
+      Users.updateOne({username: user}, {$push: {"dungeons": result.insertedId}},function(err,results){
+        //res.redirect(`/dungeons/${result.insertedId}`)
+        //CALL FUNC DIRECTLY W/O REDIRECT
+        //sendSpecificDungeonNew(dungeonToInsert)
+        res.render('mainView.pug',{session: req.session, dungeon: dungeonToInsert})
+      })
+    }
+  })
+}
+
 function sendRooms(req,res,next){
   
 }
+
+
+function sendSpecificDungeon(req,res,next){ 
+  console.log(req.params)
+  console.log("HEY THIS IS WHAT DUNGEON ID IS APPARENTLY:")
+  console.log(req.params.dungeonID)
+  let dungeonID = String(req.params.dungeonID)
+  console.log(typeof dungeonID)
+  //res.render("mainView.pug",{session: req.session,dungeon: testDungeon})
+  
+  Dungeons.findOne({"_id": ObjectId(dungeonID)}, function(err,result){
+    if (!(result === null)){
+      console.log('dungeon found, serving')
+      //res.redirect('/main')
+      res.render("mainView.pug",{session: req.session,dungeon: result})
+    }
+  })
+  console.log("im first because im not async")
+  
+}
+
+function sendDungeons(req,res,next){
+  Dungeons.find({user: req.session.username}).toArray(function(err,results){
+    if (err){
+      console.log(err)
+    }
+    //there are no dungeons for the user
+    if (results.length == 0){
+      console.log("i found no dungeons")
+      res.render('dungeonSelect.pug', {dungeons: results, noDungeon: true})
+    }else{
+      console.log("i found dungeons")
+      res.render('dungeonSelect.pug',{dungeons: results, noDungeon: false})
+    }
+
+  })
+}
+
 
 
 function serveHome(req,res,next){
@@ -143,7 +224,8 @@ function register(req,res,next){
       newUser= {
           username: username,
           password: password,
-          dungeons: []
+          dungeons: [],
+          currentDungeon: ''
       }
       //add the user
       Users.insertOne(newUser,function(err,result){
@@ -160,7 +242,7 @@ function register(req,res,next){
     }
   })
 }
-
+//give credit to dave mckenney lecture
 function login(req,res,next){
   if(req.session.loggedin){
     res.render("home.pug", {session: req.session})
@@ -232,14 +314,19 @@ function saveRoomData(req,res,next){
       console.log(err)
     }
     if(result === null){//room was not found so we need to insert it
-      Rooms.insertOne(roomToSave);
-      console.log('I saved')
-      res.status(200);
+      Rooms.insertOne(roomToSave,function(err,result){
+        console.log('I saved')
+        //need to update dungeons list
+        Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)}, {$push:{"rooms": result.insertedId}})
+        res.status(200);
+      });
+      
     }
     //room already does exist, so we need to replace/update it
     else{
       Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
       console.log("I replaced")
+      //no need to update dungeons
       res.status(200);
     }
 
@@ -296,12 +383,12 @@ function findMonsters(req,res,next){
 }
 
 function serveMainViewer(req,res,next){
-  res.render('mainView.pug')
+  res.render('mainView.pug',{session: req.session, dungeon: testDungeon})
 }
 
 
 function serveImagesPage(req,res,next){
-  console.log("here")
+  console.log("serving images page")
     imgModel.find({}, (err, items) => {
         if (err) {
             console.log(err);
@@ -315,8 +402,21 @@ function serveImagesPage(req,res,next){
 }
 
 
-function serveDungeonViewer(req,res,next){
+function serveDungeonSelect(req,res,next){
+  console.log("serving js select code")
+  fs.readFile("dungeonSelect.js", function(err, data){
+		if(err){
+			res.status(500).send("Error.");
+			return;
+		}
+		res.status(200).send(data)
+	});
 
+}
+
+
+function serveDungeonViewer(req,res,next){
+  console.log("serving js view code")
   fs.readFile("dungeonViewer.js", function(err, data){
 		if(err){
 			res.status(500).send("Error.");
@@ -328,6 +428,7 @@ function serveDungeonViewer(req,res,next){
 }
 
 function sendCSS(req,res,next){
+  console.log("serving css code")
 	fs.readFile("style.css", function(err, data){
 		if(err){
 			res.status(500).send("Error.");
