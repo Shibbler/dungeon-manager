@@ -67,6 +67,7 @@ app.get('/', serveHome);
 app.get('/images',serveImagesPage)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
+
 app.get('/rooms',sendRooms)
 app.get('/room',sendSpecificRoom)
 app.get('/dungeons',sendDungeons)
@@ -125,6 +126,8 @@ function uploadPictureToDB(req,res,next){
   })
 }
 
+
+
 function makeNewDungeon(req,res,next){
   let user = req.session.username;
   console.log(req.body.dungeonName)
@@ -181,8 +184,21 @@ function sendSpecificRoom(req,res,next){
     if (result ===null){
       console.log("specific room not found")
     }else{
-      console.log(result)
-      res.status(200).send(result)
+      let monstersToSend = []
+      //console.log(result)
+      const monsterPromises = result.monsters.map( async (monster) =>{
+        let monsterResult = await Monsters.findOne({"name": monster})
+        monstersToSend.push(monsterResult)
+        console.log('monster pushed')
+        return monsterResult;
+      })
+      //after all monsters have been found
+      Promise.all(monsterPromises).then((data)=>{
+        //console.log(monstersToSend)
+        console.log('JSON sent for specific room')
+        //console.log(result)
+        res.status(200).send(JSON.stringify({room:result,monsterData: monstersToSend}))
+      })
     }
   })
 }

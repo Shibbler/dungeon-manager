@@ -7,7 +7,25 @@ function init(){
 }
 
 function loadRoomData(data){
-    console.log(data)
+    //console.log(data)
+    data = JSON.parse(data)
+    room = data.room
+    monsterInfo = data.monsterData
+    console.log(room)
+    console.log(monsterInfo)
+    document.getElementById("currentRoomName").innerHTML = `Current Room: ${room.name}`
+    document.getElementById("roomName").value = room.name
+
+    //populate the monsters in rooms field
+    newHtml = '<div id="roomStats"></div>'
+    for (monster of monsterInfo){
+        console.log(monster)
+        newHtml+=`<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+    }
+    document.getElementById('monsterDisplay').innerHTML = newHtml
+    calculateRoomStats()
+    //newItem = `<li id="${data+(Math.random() * 1000)}" name="${monsterData.getAttribute("name")}" hp = "${monsterData.getAttribute("hp")}" cr="${monsterData.getAttribute("cr")}"  draggable="true" ondragstart="drag(event)"> ${document.getElementById(data).textContent} </li>`
+    
 }
 
 
@@ -16,8 +34,6 @@ function populateRoomField(){
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
-            //console.log(this.response)
-            //console.log(document.body)
             document.getElementById("roomsInDungeon").innerHTML =this.response;
         }
 	}
@@ -33,8 +49,6 @@ function changeRoom(id){
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
-            //console.log(this.response)
-            //console.log(document.body)
            loadRoomData(this.response)
         }
 	}
@@ -50,8 +64,6 @@ function searchVault(){
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
-            //console.log(this.response)
-            //console.log(document.body)
             document.getElementById("monstersInVault").innerHTML=this.response;
         }
 	}
@@ -151,9 +163,6 @@ function saveRoom(){
     let req = new XMLHttpRequest();
     req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
-            //console.log(this.response)
-            //console.log(document.body)
-            //document.getElementById("monstersInVault").innerHTML=this.response;
             console.log('saved')
             populateRoomField();
         }
