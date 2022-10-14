@@ -27,6 +27,7 @@ let tickingNameID = 0;
 //define schema for images
 var imgModel = require('./schemas/imageModel');
 const { query } = require('express');
+const { assert } = require('console');
 
 let testDungeon = {name: 'test', _id: 'TEST ID'}
 
@@ -67,6 +68,7 @@ app.get('/images',serveImagesPage)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
 app.get('/rooms',sendRooms)
+app.get('/room',sendSpecificRoom)
 app.get('/dungeons',sendDungeons)
 
 //this is grabbing CSS and dungeonViewer.js for some reason\
@@ -152,26 +154,56 @@ function makeNewDungeon(req,res,next){
 }
 
 function sendRooms(req,res,next){
-  
+    console.log(req.query.dungeonID)
+    let dungeonID = req.query.dungeonID
+    //find the dungeon for the room
+    htmlToSend = '';
+
+    Dungeons.findOne({"_id": ObjectId(dungeonID)},function(err,result){
+      
+      let roomResult;
+      if (result.rooms.length){
+        const roomPromises = result.rooms.map( async (room) =>{
+          let roomResult = await Rooms.findOne({"_id": ObjectId(room._id)})
+          htmlToSend+= `<li id="${roomResult._id}" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')" >Room: ${roomResult.name}</li><br>`
+          return roomResult;
+        })
+        Promise.all(roomPromises).then((data)=>{
+          res.status(200).send(htmlToSend)
+        })
+      }
+    })
+}
+
+function sendSpecificRoom(req,res,next){
+  console.log(req.query.roomID)
+  Rooms.findOne({"_id": ObjectId(req.query.roomID)}, function(err,result){
+    if (result ===null){
+      console.log("specific room not found")
+    }else{
+      console.log(result)
+      res.status(200).send(result)
+    }
+  })
 }
 
 
 function sendSpecificDungeon(req,res,next){ 
-  console.log(req.params)
-  console.log("HEY THIS IS WHAT DUNGEON ID IS APPARENTLY:")
-  console.log(req.params.dungeonID)
+  //console.log(req.params)
+  //console.log("HEY THIS IS WHAT DUNGEON ID IS APPARENTLY:")
+  //console.log(req.params.dungeonID)
   let dungeonID = String(req.params.dungeonID)
-  console.log(typeof dungeonID)
+  //console.log(typeof dungeonID)
   //res.render("mainView.pug",{session: req.session,dungeon: testDungeon})
   
   Dungeons.findOne({"_id": ObjectId(dungeonID)}, function(err,result){
     if (!(result === null)){
-      console.log('dungeon found, serving')
+      //console.log('dungeon found, serving')
       //res.redirect('/main')
       res.render("mainView.pug",{session: req.session,dungeon: result})
     }
   })
-  console.log("im first because im not async")
+  //console.log("im first because im not async")
   
 }
 
@@ -297,7 +329,7 @@ function logout(req,res,next){
 
 //INCOMPLETE
 function saveRoomData(req,res,next){
-  console.log(req.body)
+  //console.log(req.body)
   if (!req.body.roomName){
     roomName = 'untitled'
   }else{
@@ -318,7 +350,7 @@ function saveRoomData(req,res,next){
         console.log('I saved')
         //need to update dungeons list
         Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)}, {$push:{"rooms": result.insertedId}})
-        res.status(200);
+        res.status(200).send();
       });
       
     }
@@ -327,7 +359,7 @@ function saveRoomData(req,res,next){
       Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
       console.log("I replaced")
       //no need to update dungeons
-      res.status(200);
+      res.status(200).send();
     }
 
   })
@@ -388,7 +420,7 @@ function serveMainViewer(req,res,next){
 
 
 function serveImagesPage(req,res,next){
-  console.log("serving images page")
+  //console.log("serving images page")
     imgModel.find({}, (err, items) => {
         if (err) {
             console.log(err);
@@ -403,7 +435,7 @@ function serveImagesPage(req,res,next){
 
 
 function serveDungeonSelect(req,res,next){
-  console.log("serving js select code")
+  //console.log("serving js select code")
   fs.readFile("dungeonSelect.js", function(err, data){
 		if(err){
 			res.status(500).send("Error.");
@@ -416,7 +448,7 @@ function serveDungeonSelect(req,res,next){
 
 
 function serveDungeonViewer(req,res,next){
-  console.log("serving js view code")
+  //console.log("serving js view code")
   fs.readFile("dungeonViewer.js", function(err, data){
 		if(err){
 			res.status(500).send("Error.");
@@ -428,7 +460,7 @@ function serveDungeonViewer(req,res,next){
 }
 
 function sendCSS(req,res,next){
-  console.log("serving css code")
+  //console.log("serving css code")
 	fs.readFile("style.css", function(err, data){
 		if(err){
 			res.status(500).send("Error.");

@@ -1,9 +1,48 @@
 function init(){
 	console.log("ya got me")
     calculateRoomStats();
+    populateRoomField();
+
     
 }
-let curDungeon = "TEST DUNGEON"
+
+function loadRoomData(data){
+    console.log(data)
+}
+
+
+function populateRoomField(){
+    let req = new XMLHttpRequest();
+    //read html data and update page accordingly.
+	req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+            //console.log(this.response)
+            //console.log(document.body)
+            document.getElementById("roomsInDungeon").innerHTML =this.response;
+        }
+	}
+
+    req.open("GET", `/rooms?dungeonID=${document.getElementById('dungeonID').value}`);
+    req.setRequestHeader("Content-Type", "text/html")
+	req.send();
+}
+
+function changeRoom(id){
+    console.log('id')
+    let req = new XMLHttpRequest();
+    //read html data and update page accordingly.
+	req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+            //console.log(this.response)
+            //console.log(document.body)
+           loadRoomData(this.response)
+        }
+	}
+
+    req.open("GET", `/room?roomID=${id}`);
+    req.setRequestHeader("Content-Type", "text/html")
+	req.send();
+}
 
 
 function searchVault(){
@@ -116,7 +155,7 @@ function saveRoom(){
             //console.log(document.body)
             //document.getElementById("monstersInVault").innerHTML=this.response;
             console.log('saved')
-            alert('saved!')
+            populateRoomField();
         }
 	}
     let monstersInRoom = document.getElementById("monsterDisplay").getElementsByTagName("li");
