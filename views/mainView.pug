@@ -42,5 +42,16 @@ body(onload="init()")
             div#monstersInVault
         </div>
         <div class="currentMapDisplay">
-            p currentMap</div>
+            p currentMap
+            div#mapSubmit
+            <label for="image">Upload Map</label>
+            input(type="file" id="image" name="image" value="" required)
+            <button type="button" onclick="submitMap()">Submit Map</button>                                
+            
+             <button type="button" onclick="getMap()">get Map</button>
+            div#mapDisplay
+            
+            
+        </div>
+
     </div>

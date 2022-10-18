@@ -2,8 +2,8 @@
 let mongoose = require('mongoose');
 
 let imageSchema = new mongoose.Schema({
-    name: String,
-    desc: String,
+    room: String,
+    dungeon: String,
     img:
     {
         data: Buffer,

@@ -55,6 +55,7 @@ let Monsters = db.collection('monsters');
 let Rooms = db. collection('rooms');
 let Users = db.collection('users')
 let Dungeons = db.collection('dungeons');
+let Images = db.collection('image');
 
 //define session and other values
 app.use(session({ secret: 'some secret here',store: store}))
@@ -64,7 +65,7 @@ app.use(express.urlencoded({extended: true}));
 
 //define gateways
 app.get('/', serveHome);
-app.get('/images',serveImagesPage)
+app.get('/map',serveMap)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
 
@@ -80,7 +81,7 @@ app.post('/dungeons',makeNewDungeon)
 //gets for files
 app.get("/style.css",sendCSS)
 app.get("/dungeonViewer.js",serveDungeonViewer)
-//acount for the 'within' issues
+//acount for the 'within' issues PROBABLY NOT NEEDED ANYMORE
 app.get("/dungeons/style.css",sendCSS)
 app.get("/dungeons/dungeonViewer.js",serveDungeonViewer)
 app.get("/dungeonSelect.js",serveDungeonSelect)
@@ -93,7 +94,7 @@ app.post("/login",login)
 app.get("/logout",logout)
 
 
-app.post('/images',upload.single('image'),uploadPictureToDB)
+app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
 
 
@@ -101,18 +102,60 @@ app.post('/roomSave',saveRoomData)
 //app.get("/orderform.js", sendOrderJs);
 //app.get("/userList.js", sendUserList);
 
+
+//maybe make the room sent this when its sending data MAYBE DO IT THIS WAY FOR NOW
+
+function serveMap(req,res,next){
+  //console.log("serving images page"
+
+  console.log(req.query)
+  let roomName = req.query.roomName;
+  let dungeon = req.query.dungeon;
+  console.log(roomName)
+  console.log(dungeon)
+  imgModel.findOne({room: roomName, dungeon: dungeon }, (err, item) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send('An error occurred', err);
+      }
+      else if (item == null || item.img == null){
+        //console.log(item)
+        console.log("got nothing for map search")
+      }
+      else {
+        console.log("found map!")
+        //console.log(item)
+        //console.log(item.img)
+        res.render("imagePortion.pug",{map:item})
+      }
+  })
+}
+
+
 function uploadPictureToDB(req,res,next){
   console.log("picture upload")
   //create the image to upload
   fileName = path.join(__dirname + '/uploads/' + req.file.filename)
+  console.log(req.body.roomName)
+  console.log(req.body.dungeon)
   var obj = {
-    name: req.body.name,
-    desc: req.body.desc,
+    //add room data
+    room: req.body.roomName,
+    dungeon: req.body.dungeon,
     img: {
         data: fs.readFileSync(fileName),
         contentType: 'image/png'
     }
   }
+  console.log(obj.room, obj.dungeon,obj.img.contentType)
+  //delete the old room if it exists
+  imgModel.findOne({room: req.body.roomName, dungeon:req.body.dungeon}).remove(function(err,item){
+    if (err){
+      console.log(err)
+    }else{
+      console.log("old file removed")
+    }
+  });
   //upload the image to mongoose by using the schema.create feature
   imgModel.create(obj, (err, item) => {
     if (err) {
@@ -121,7 +164,12 @@ function uploadPictureToDB(req,res,next){
     else {
         //delete the file so it only stored on mongo
         fs.unlinkSync(fileName)
-        res.redirect('/images');
+        //send something to code
+        //temp sol'n rn
+        //console.log(item.img.contentType)
+        console.log('upload successful')
+        res.render("imagePortion.pug",{map:item})
+        //res.status(200).send(item)
     }
   })
 }
@@ -150,7 +198,8 @@ function makeNewDungeon(req,res,next){
         //res.redirect(`/dungeons/${result.insertedId}`)
         //CALL FUNC DIRECTLY W/O REDIRECT
         //sendSpecificDungeonNew(dungeonToInsert)
-        res.render('mainView.pug',{session: req.session, dungeon: dungeonToInsert})
+        //res.render('mainView.pug',{session: req.session, dungeon: dungeonToInsert})
+        res.redirect(`/dungeons/${result.insertedId}`)
       })
     }
   })
@@ -357,7 +406,7 @@ function saveRoomData(req,res,next){
     monsters: req.body.monsters,
     name: roomName
   }
-  Rooms.findOne({name: roomName, user: req.session.username}, function(err,result){
+  Rooms.findOne({name: roomName, user: req.session.username, dungeon: req.session.dungeon}, function(err,result){
     if (err){
       console.log(err)
     }
@@ -435,19 +484,6 @@ function serveMainViewer(req,res,next){
 }
 
 
-function serveImagesPage(req,res,next){
-  //console.log("serving images page")
-    imgModel.find({}, (err, items) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('An error occurred', err);
-        }
-        else {
-            console.log("here!")
-            res.render('imagesPage.ejs', { items: items });
-        }
-    })
-}
 
 
 function serveDungeonSelect(req,res,next){
