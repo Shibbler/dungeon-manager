@@ -19,7 +19,6 @@ const bodyParser = require('body-parser')
 
 //using two view engines
 app.set('view engine', 'pug');
-app.set('view engine', 'ejs');
 
 //naming for file, temporary
 let tickingNameID = 0;
@@ -81,9 +80,6 @@ app.post('/dungeons',makeNewDungeon)
 //gets for files
 app.get("/style.css",sendCSS)
 app.get("/dungeonViewer.js",serveDungeonViewer)
-//acount for the 'within' issues PROBABLY NOT NEEDED ANYMORE
-app.get("/dungeons/style.css",sendCSS)
-app.get("/dungeons/dungeonViewer.js",serveDungeonViewer)
 app.get("/dungeonSelect.js",serveDungeonSelect)
 
 //users stuff
@@ -92,18 +88,54 @@ app.post('/register',register);
 app.get("/login",serveLoginPage)
 app.post("/login",login)
 app.get("/logout",logout)
-
+app.get("/create",serveCreationPage)
+app.post("/create",insertCreation)
 
 app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
 
 
-//to read the HTML files
-//app.get("/orderform.js", sendOrderJs);
-//app.get("/userList.js", sendUserList);
+function serveCreationPage(req,res,next){
+  res.render('create.pug',{errorName: false, errorNaN: false})
+}
+
+function insertCreation(req,res,next){
+  //ensure numbers
+  if (isNaN(req.body.hp) || isNaN(req.body.cr) || isNaN(req.body.ac)){
+    res.render('create.pug',{errorName: false, errorNaN: true})
+    return;
+  }
+  Monsters.findOne({name: {$regex : req.body.name, $options: 'i'}},function(err,result){
+    //if the monster already exists
+    if (result != null){
+      res.render('create.pug',{errorName: true, errorNaN: false} )
+    }
+    else{
+      let monsterToInsert = {
+        name: req.body.name,
+        armor_class: req.body.ac,
+        size: req.body.size,
+        type: req.body.type,
+        subtype: req.body.subtype,
+        hit_points: req.body.hp,
+        alignment: req.body.alignment,
+        damage_vulnerabilities: req.body.damage_vulnerabilities,
+        damage_resistances: req.body.damage_resistances,
+        damage_immunities: req.body.damage_immunities,
+        condition_immunities: req.body.condition_immunities,
+        languages: req.body.languages,
+        challenge_rating: req.body.cr
+      }
+      Monsters.insertOne(monsterToInsert,function(err,result){
+        res.redirect('/')
+      })
+    }
+  })
+
+  //res.redirect('/')
+}
 
 
-//maybe make the room sent this when its sending data MAYBE DO IT THIS WAY FOR NOW
 
 function serveMap(req,res,next){
   //console.log("serving images page"
@@ -121,6 +153,7 @@ function serveMap(req,res,next){
       else if (item == null || item.img == null){
         //console.log(item)
         console.log("got nothing for map search")
+        res.status(200).send("No Map for this Room")
       }
       else {
         console.log("found map!")

@@ -1,0 +1,72 @@
+html
+link(rel='stylesheet', href='/style.css')
+head
+    title Monster Creation
+a(href='/') Home
+br
+br
+
+if (errorName)
+    script.
+        alert("Error on Monster Creation, that name already exists, please choose a unique name")
+if (errorNaN)
+    script.
+        alert("Error on Monster Creation, please ensure fields requiring numbers are numeric (decimals allowed)")
+
+
+form(action='/create' method="post")
+    p Define Monster Stats
+        br
+        br
+        label(for='name') Monster Name (Must be Unique)       
+        input(type="text" id= 'name' name= "name" required)
+        br
+        br
+        label(for='cr') Challenge Rating (CR)   
+        input(type="text" id = 'cr' name= "cr" required)
+        br
+        br
+        label(for='ac') Armour Class (AC)       
+        input(type="text" id = 'ac' name= "ac" required)
+        br
+        br
+        label(for='hp') Hit Points (HP)     
+        input(type="text" id = 'hp' name= "hp" required)
+        br
+        br
+        label(for='size') Size          
+        input(type="text" id = "size" name= "size")
+        br
+        br
+        label(for='type') Type          
+        input(type="text" id = "type" name= "type")
+        br
+        br
+        label(for='subtype') Subtype      
+        input(type="text" id = 'subtype' name= "subtype")
+        br
+        br
+        label(for='alignment') Alignment       
+        input(type="text" id = 'alignment' name= "alignment")
+        br
+        br
+        label(for='languages') Languages   
+        input(type="text" id = 'languages' name= "languages")
+        br
+        br
+        label(for='damage_vulnerabilities') Damage Vulnerabilities    
+        input(type="text" id = 'damage_vulnerabilities' name= "damage_vulnerabilities")
+        br
+        br
+        label(for='damage_resistances') Damage Resistances   
+        input(type="text" id = 'damage_resistances' name= "damage_resistances")
+        br
+        br
+        label(for='damage_immunities') Damage Immunities    
+        input(type="text" id = 'damage_immunities' name= "damage_immunities")
+        br
+        br
+        label(for='condition_immunities') Condition Immunities    
+        input(type="text" id = 'condition_immunities' name= "condition_immunities")
+        br
+    button(type="submit") Insert Monster to DB
