@@ -72,8 +72,7 @@ app.get('/rooms',sendRooms)
 app.get('/room',sendSpecificRoom)
 app.get('/dungeons',sendDungeons)
 
-//this is grabbing CSS and dungeonViewer.js for some reason\
-//theyre
+app.post('/room/monster',changeMonsterRoom)
 app.get('/dungeons/:dungeonID',sendSpecificDungeon)
 app.post('/dungeons',makeNewDungeon)
 
@@ -93,6 +92,18 @@ app.post("/create",insertCreation)
 
 app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
+
+
+function changeMonsterRoom(req,res,next){
+  console.log(`adding monster: ${req.body.monster}`)
+  Rooms.updateOne({"_id": ObjectId(req.body.roomID)}, {$push:{"monsters": req.body.monster}}, function(err,result){
+    if (err) console.log(err)
+    else{
+      res.status(200).send();
+    }
+  })
+
+}
 
 
 function serveCreationPage(req,res,next){
@@ -250,7 +261,7 @@ function sendRooms(req,res,next){
       if (result.rooms.length){
         const roomPromises = result.rooms.map( async (room) =>{
           let roomResult = await Rooms.findOne({"_id": ObjectId(room._id)})
-          htmlToSend+= `<li id="${roomResult._id}" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')" >Room: ${roomResult.name}</li><br>`
+          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}</div><br>`
           return roomResult;
         })
         Promise.all(roomPromises).then((data)=>{
@@ -428,6 +439,7 @@ function logout(req,res,next){
 //INCOMPLETE
 function saveRoomData(req,res,next){
   //console.log(req.body)
+  console.log(req.body.roomName)
   if (!req.body.roomName){
     roomName = 'untitled'
   }else{
@@ -439,7 +451,10 @@ function saveRoomData(req,res,next){
     monsters: req.body.monsters,
     name: roomName
   }
-  Rooms.findOne({name: roomName, user: req.session.username, dungeon: req.session.dungeon}, function(err,result){
+  console.log('about to look for room')
+  console.dir({roomToSave})
+  Rooms.findOne({name: roomName, user: req.session.username, dungeon: req.body.dungeon}, function(err,result){
+    console.log(result)
     if (err){
       console.log(err)
     }
@@ -461,7 +476,7 @@ function saveRoomData(req,res,next){
     }
 
   })
-  console.log("roomSaved")
+  //console.log("roomSaved")
 }
 
 
@@ -488,7 +503,7 @@ function findMonsters(req,res,next){
       //let htmlToSend = ``;
       for (i = 0; i < results.length; i++){
         monster = results[i];
-        htmlToSend += `<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+        htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</div><br>`
       }
       res.status(200).send(htmlToSend);
      
@@ -504,7 +519,7 @@ function findMonsters(req,res,next){
        // console.log("I will send some html now")
         for (i = 0; i < results.length; i++){
           monster = results[i];
-          htmlToSend += `<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+          htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</div><br>`
         }
         res.status(200).send(htmlToSend)
       }

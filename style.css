@@ -15,6 +15,31 @@
     overflow:scroll; 
   
   }
+
+  .roomDiv{
+    border-radius: 25px;
+    background: #85477f;
+    padding: 10px;
+    width: 90%;
+    height: 75px;
+  }
+
+  .monsterDiv{
+    border-radius: 25px;
+      background: #29789c;
+      padding: 10px;
+      width: 90%;
+      height: 75px;
+  }
+
+  .monsterInRoom{
+      border-radius: 25px;
+      background: #b14031;
+      padding: 10px;
+      width: 90%;
+      height: 75px;
+  
+  }
   
   .monsterDisplay {
     grid-area: monsterDisplay;

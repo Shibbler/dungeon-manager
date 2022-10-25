@@ -12,7 +12,7 @@ function getMap(){
     let req = new XMLHttpRequest();
     req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
-            console.log(this.response)
+            //console.log(this.response)
             document.getElementById("mapDisplay").innerHTML = this.response
         }
 	}
@@ -47,11 +47,6 @@ function submitMap(){
 }
 
 
-function loadMapImage(roomID){
-    console.log(roomID)
-}
-
-
 function loadRoomData(data){
     //console.log(data)
     data = JSON.parse(data)
@@ -66,14 +61,11 @@ function loadRoomData(data){
     newHtml = '<div id="roomStats"></div>'
     for (monster of monsterInfo){
         //console.log(monster)
-        newHtml+=`<li id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</li>`
+        newHtml+=`<div class="monsterInRoom" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</div><br>`
     }
     document.getElementById('monsterDisplay').innerHTML = newHtml
     calculateRoomStats()
-    //maybe bad place for this
-    loadMapImage(room._id)
 
-   
     
 }
 
@@ -85,7 +77,7 @@ function populateRoomField(){
 	req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
             console.log("loading new rooms")
-            console.log(this.response)
+            //console.log(this.response)
             document.getElementById("roomsInDungeon").innerHTML =this.response;
         }
 	}
@@ -170,7 +162,7 @@ function allowDrop(ev) {
 
     //console.log(data)
     //ev.target.appendChild(document.getElementById(data));
-    newItem = `<li id="${data+(Math.random() * 1000)}" name="${monsterData.getAttribute("name")}" hp = "${monsterData.getAttribute("hp")}" cr="${monsterData.getAttribute("cr")}"  draggable="true" ondragstart="drag(event)"> ${document.getElementById(data).textContent} </li>`
+    newItem = `<div class="monsterInRoom" id="${data+(Math.random() * 1000)}" name="${monsterData.getAttribute("name")}" hp = "${monsterData.getAttribute("hp")}" cr="${monsterData.getAttribute("cr")}"  draggable="true" ondragstart="drag(event)"> ${document.getElementById(data).textContent} </div><br>`
     ev.target.innerHTML += newItem
     calculateRoomStats()
   }
@@ -185,9 +177,36 @@ function allowDrop(ev) {
     calculateRoomStats()
   }
 
+  //move a monster from current room to a different room, user still has to save their current room
+  function dropRoom(ev,id,name){
+    if (name === document.getElementById("roomName").value){
+        console.log('trying to add to new room'); 
+        return;
+    }
+    let req = new XMLHttpRequest();
+    //read html data and update page accordingly.
+	req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+          console.log('done monster room change')
+          document.getElementById("monsterDisplay").removeChild(document.getElementById(data));
+        }
+	}
+    console.log(`dropping room: ${ev}`)
+    var data = ev.dataTransfer.getData("text");
+    console.log(data)
+    monsterName = document.getElementById(data).getAttribute('name')
+    console.log(monsterName)
+    //document.getElementById("monsterDisplay").removeChild(document.getElementById(data));
+
+    req.open("POST", `/room/monster`);
+    req.setRequestHeader("Content-Type", "application/json")
+	req.send(JSON.stringify({monster: monsterName, roomID: id}));
+
+  }
+
 
 function calculateRoomStats(){
-    let monstersInRoom = document.getElementById("monsterDisplay").getElementsByTagName("li");
+    let monstersInRoom = document.getElementById("monsterDisplay").getElementsByClassName("monsterInRoom");
     let totalCr = 0;
     let totalHp = 0;
     //console.log(monstersInRoom.length)
@@ -220,12 +239,12 @@ function saveRoom(){
             populateRoomField();
         }
 	}
-    let monstersInRoom = document.getElementById("monsterDisplay").getElementsByTagName("li");
+    let monstersInRoom = document.getElementById("monsterDisplay").getElementsByClassName("monsterInRoom");
     let monstersToSave = [];
     for (i = 0; i<monstersInRoom.length;i++){
        monstersToSave.push(monstersInRoom[i].getAttribute("name"))
     }
-    //console.log(monstersToSave)
+    console.log(monstersToSave)
     req.open("post", `/roomSave`);
     req.setRequestHeader("Content-Type", "application/json")
 	req.send(JSON.stringify({monsters: monstersToSave, dungeon: `${document.getElementById('dungeonID').value}`, roomName: document.getElementById("roomName").value}));
