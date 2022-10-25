@@ -1,3 +1,5 @@
+html {background-color: #e9d1ad;}
+
 .container {  display: grid;
     grid-template-columns: 0.6fr 1.4fr 1fr;
     grid-template-rows: 4em 1.2fr 0.8fr;
@@ -8,17 +10,10 @@
       "roomsDisplay currentMapDisplay vaultDisplay"
       "roomsDisplay monsterDisplay vaultDisplay";
   }
-  
-  .roomsDisplay {
-    grid-area: roomsDisplay;
-    height: 650px;
-    overflow:scroll; 
-  
-  }
 
   .roomDiv{
     border-radius: 25px;
-    background: #85477f;
+    background: #88cdec;
     padding: 10px;
     width: 90%;
     height: 75px;
@@ -26,7 +21,7 @@
 
   .monsterDiv{
     border-radius: 25px;
-      background: #29789c;
+      background: #b85858;
       padding: 10px;
       width: 90%;
       height: 75px;
@@ -38,23 +33,38 @@
       padding: 10px;
       width: 90%;
       height: 75px;
-  
+      
   }
   
+  .roomsDisplay {
+    padding: 10px;
+    width: 90%;
+    grid-area: roomsDisplay;
+    height: 650px;
+    overflow:scroll; 
+    background: #c75f79;
+    border-radius: 10%;
+  }
+
   .monsterDisplay {
+    padding: 10px;
+    border-radius: 10%;
     grid-area: monsterDisplay;
     overflow:scroll;
-  
+    background: #c48449;
   }
   
   .vaultDisplay { 
+    padding: 10px;
+    width: 90%;
     grid-area: vaultDisplay;
     height: 650px;
     overflow:scroll;
-                  
+    background: #498856;
+    border-radius: 10%;               
   }
   
-  .currentMapDisplay { grid-area: currentMapDisplay; }
+  .currentMapDisplay { grid-area: currentMapDisplay; overflow: scroll; }
 
   .column {
     float: left;
