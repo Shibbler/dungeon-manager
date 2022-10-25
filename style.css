@@ -1,4 +1,6 @@
-html {background-color: #e9d1ad;}
+html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  sans-serif;}
 
 .container {  display: grid;
     grid-template-columns: 0.6fr 1.4fr 1fr;
@@ -9,6 +11,25 @@ html {background-color: #e9d1ad;}
       ". . ."
       "roomsDisplay currentMapDisplay vaultDisplay"
       "roomsDisplay monsterDisplay vaultDisplay";
+  }
+
+
+  button{
+    display:inline-block;
+    padding:0.3em 1.2em;
+    margin:0 0.3em 0.3em 0;
+    border-radius:2em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-weight:300;
+    color:#FFFFFF;
+    background-color:#ec7631;
+    text-align:center;
+    transition: all 0.2s;
+  }
+  button:hover{
+    background-color:#bd795e;
   }
 
   .roomDiv{
