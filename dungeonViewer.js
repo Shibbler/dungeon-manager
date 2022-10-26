@@ -8,6 +8,27 @@ function init(){
 }
 
 
+function deleteRoom(event,id,name){
+    if (name === document.getElementById("roomName").value){
+        console.log('trying to delete current room');
+        alert("Trying to delete current room, not allowed")
+        return;
+    }
+    event.stopPropagation();
+    //console.log(id,name)
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+            console.log('room removed')
+            populateRoomField()
+            
+        }
+	}
+    req.open("POST", `/deleteRoom`);
+    req.setRequestHeader("Content-Type", "application/json")
+	req.send(JSON.stringify({roomID: id, roomName: name, dungeon: document.getElementById('dungeonID').value}));
+}
+
 function getMap(){
     let req = new XMLHttpRequest();
     req.onreadystatechange = function() {
@@ -88,7 +109,7 @@ function populateRoomField(){
 }
 
 function changeRoom(id){
-    console.log('id')
+    //console.log('id')
     let req = new XMLHttpRequest();
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
@@ -236,7 +257,9 @@ function saveRoom(){
     req.onreadystatechange = function() {
 		if(this.readyState==4 && this.status==200){
             console.log('saved')
-            populateRoomField();
+            populateRoomField()
+            console.log(JSON.parse(this.response))
+            changeRoom(JSON.parse(this.response))
         }
 	}
     let monstersInRoom = document.getElementById("monsterDisplay").getElementsByClassName("monsterInRoom");
@@ -244,7 +267,7 @@ function saveRoom(){
     for (i = 0; i<monstersInRoom.length;i++){
        monstersToSave.push(monstersInRoom[i].getAttribute("name"))
     }
-    console.log(monstersToSave)
+    //console.log(monstersToSave)
     req.open("post", `/roomSave`);
     req.setRequestHeader("Content-Type", "application/json")
 	req.send(JSON.stringify({monsters: monstersToSave, dungeon: `${document.getElementById('dungeonID').value}`, roomName: document.getElementById("roomName").value}));

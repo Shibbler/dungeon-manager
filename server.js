@@ -75,6 +75,7 @@ app.get('/dungeons',sendDungeons)
 app.post('/room/monster',changeMonsterRoom)
 app.get('/dungeons/:dungeonID',sendSpecificDungeon)
 app.post('/dungeons',makeNewDungeon)
+app.post('/deleteRoom',deleteRoom)
 
 //gets for files
 app.get("/style.css",sendCSS)
@@ -92,6 +93,23 @@ app.post("/create",insertCreation)
 
 app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
+
+
+function deleteRoom(req,res,next){
+  //delete the room from the dungeon
+  Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)},{$pull: {'rooms':ObjectId(req.body.roomID)}},function (err,result){
+    if (err) console.log(err)
+    //delete image associated with room
+    imgModel.deleteOne({dungeon: req.body.dungeon,room: req.body.roomName},function(err,result){
+      if (err) console.log(err)
+      //delete the actual room
+      Rooms.deleteOne({"_id":ObjectId(req.body.roomID)},function(err,result){
+        if (err) console.log(err)
+        res.status(200).send();
+      })
+    })
+  })
+}
 
 
 function changeMonsterRoom(req,res,next){
@@ -261,7 +279,7 @@ function sendRooms(req,res,next){
       if (result.rooms.length){
         const roomPromises = result.rooms.map( async (room) =>{
           let roomResult = await Rooms.findOne({"_id": ObjectId(room._id)})
-          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}</div><br>`
+          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}<button onclick="deleteRoom(event,'${roomResult._id}','${roomResult.name}')">Delete Room</button></div><br>`
           return roomResult;
         })
         Promise.all(roomPromises).then((data)=>{
@@ -463,7 +481,7 @@ function saveRoomData(req,res,next){
         console.log('I saved')
         //need to update dungeons list
         Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)}, {$push:{"rooms": result.insertedId}})
-        res.status(200).send();
+        res.status(200).send(JSON.stringify(result.insertedId));
       });
       
     }
@@ -472,7 +490,7 @@ function saveRoomData(req,res,next){
       Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
       console.log("I replaced")
       //no need to update dungeons
-      res.status(200).send();
+      res.status(200).send(JSON.stringify(result._id));
     }
 
   })
