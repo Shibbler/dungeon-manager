@@ -504,8 +504,8 @@ function findMonsters(req,res,next){
   if (req.body.id){
     console.log('I should only find one monster')
   }
-  else if (req.query.monsterName || req.query.cr){
-    console.log(req.query.monsterName)
+  else if (req.query.monsterName || req.query.cr||req.query.ac||req.query.hp||req.query.size||req.query.type||req.query.language||req.query.alignment){
+    //console.log(req.query.monsterName)
     //build query
     let queryToSearch = {};
     if (req.query.monsterName){
@@ -513,6 +513,24 @@ function findMonsters(req,res,next){
     }
     if (req.query.cr){
       queryToSearch.challenge_rating = req.query.cr
+    }
+    if (req.query.ac && !isNaN(req.query.ac)){
+      queryToSearch.armor_class = Number(req.query.ac)
+    }
+    if (req.query.hp && !isNaN(req.query.hp)){
+      queryToSearch.hit_points = Number(req.query.hp)
+    }
+    if (req.query.size){
+      queryToSearch.size = {$regex : req.query.size, $options: 'i'}
+    }
+    if (req.query.type){
+      queryToSearch.type = {$regex : req.query.type, $options: 'i'}
+    }
+    if (req.query.language){
+      queryToSearch.languages = {$regex : req.query.language, $options: 'i'}
+    }
+    if (req.query.alignment){
+      queryToSearch.alignment = req.query.alignment.toLowerCase();
     }
     console.log(queryToSearch)
   

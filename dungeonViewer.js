@@ -135,6 +135,13 @@ function searchVault(){
 	}
     nameForSearch = document.getElementById("monsterNameSearch").value
     challengeRating = document.getElementById("monsterChallengeSearch").value
+    ac = document.getElementById("monsterArmourSearch").value
+    hp = document.getElementById("monsterHpSearch").value
+    size = document.getElementById("monsterSizeSearch").value
+    type = document.getElementById("monsterTypeSearch").value
+    language = document.getElementById("monsterLanguageSearch").value
+    alignment = document.getElementById("monsterAlignmentSearch").value
+
     //console.log(nameForSearch)
     let searchCondition = ''
     let needsAmp = false
@@ -150,6 +157,54 @@ function searchVault(){
         }
         //console.log("I am adding to search CR")
         searchCondition+=`cr=${challengeRating}`
+        needsAmp = true;
+    }
+    if (ac){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`ac=${ac}`
+        needsAmp = true;
+    }
+    if (hp){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`hp=${hp}`
+        needsAmp = true;
+    }
+    if (size){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`size=${size}`
+        needsAmp = true;
+    }
+    if (type){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`type=${type}`
+        needsAmp = true;
+    }
+    if (language){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`language=${language}`
+        needsAmp = true;
+    }
+    if (alignment){
+        if (needsAmp){
+            searchCondition+="&"
+        }
+        //console.log("I am adding to search CR")
+        searchCondition+=`alignment=${alignment}`
         needsAmp = true;
     }
     //console.log(searchCondition);

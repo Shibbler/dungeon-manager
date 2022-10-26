@@ -35,12 +35,36 @@ body(onload="init()")
                 br
                 input#monsterChallengeSearch(type="textbox")
                 br
+            p Monster AC (=)
+                br
+                input#monsterArmourSearch(type="textbox")
+                br
+            p Monster HP (=)
+                br
+                input#monsterHpSearch(type="textbox")
+                br
+            p Monster Size
+                br
+                input#monsterSizeSearch(type="textbox")
+                br
+            p Monster Type
+                br
+                input#monsterTypeSearch(type="textbox")
+                br
+            p Monster Language
+                br
+                input#monsterLanguageSearch(type="textbox")
+                br 
+            p Monster Alignment
+                br
+                input#monsterAlignmentSearch(type="textbox")
+                br
+            
             button#searchButton(type="button" onclick="searchVault()") Search
             h2 Monsters: 
             div#monstersInVault
         </div>
         <div class="currentMapDisplay">
-            p currentMap
             div#mapSubmit
             <label for="image">Upload Map</label>
             input(type="file" id="image" name="image" value="" required)
