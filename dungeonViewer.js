@@ -68,6 +68,15 @@ function submitMap(){
 }
 
 
+function newRoom(){
+    document.getElementById("currentRoomName").innerHTML = `Current Room: New Room`
+    document.getElementById("roomName").value = "new room"
+    document.getElementById('monsterDisplay').innerHTML = '<div id="roomStats"></div>'
+    document.getElementById("mapDisplay").innerHTML = "No Map for this room"
+    calculateRoomStats()
+}
+
+
 function loadRoomData(data){
     //console.log(data)
     data = JSON.parse(data)

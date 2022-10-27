@@ -14,6 +14,40 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
   }
 
 
+  input:not([type=submit]):not([type=file]) {
+  
+    -webkit-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    -moz-box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    box-shadow: 
+      inset 0 0 8px  rgba(0,0,0,0.1),
+            0 0 16px rgba(0,0,0,0.1); 
+    background: rgba(255,255,255,0.5);
+    margin: 0 0 10px 0;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
   button{
     display:inline-block;
     padding:0.3em 1.2em;
@@ -62,16 +96,17 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     width: 90%;
     grid-area: roomsDisplay;
     height: 650px;
-    overflow:scroll; 
+    overflow:auto; 
     background: #c75f79;
     border-radius: 10%;
   }
 
   .monsterDisplay {
     padding: 10px;
+    width: 95%;
     border-radius: 10%;
     grid-area: monsterDisplay;
-    overflow:scroll;
+    overflow:auto;
     background: #c48449;
   }
   
@@ -80,12 +115,12 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     width: 90%;
     grid-area: vaultDisplay;
     height: 650px;
-    overflow:scroll;
+    overflow:auto;
     background: #498856;
     border-radius: 10%;               
   }
   
-  .currentMapDisplay { grid-area: currentMapDisplay; overflow: scroll; }
+  .currentMapDisplay { grid-area: currentMapDisplay; overflow: auto; }
 
   .column {
     float: left;

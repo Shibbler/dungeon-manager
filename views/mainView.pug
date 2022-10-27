@@ -15,6 +15,9 @@ body(onload="init()")
     p Room Name (leave empty for untitled, will overwrite same-name files)  
         input#roomName(type="textbox" value= "new room")
     button#saveRoomButton(type="button" onclick="saveRoom()") Save Room to Dungeon
+    br
+    br
+    button#newRoomButton(type="button" onclick="newRoom()") Open New Room (will erase current data)
     <div id = "mainViewcontainer" class="container">
         <div class="roomsDisplay" id = "roomsDisplay">
             h1 Rooms
