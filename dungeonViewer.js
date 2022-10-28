@@ -49,7 +49,11 @@ function getMap(){
 }
 
 
-function submitMap(){
+function submitMap(needSave){
+    console.log(needSave)
+    if (needSave){
+        saveRoom();
+    }
     let req = new XMLHttpRequest();
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
@@ -322,6 +326,10 @@ function saveRoom(){
 		if(this.readyState==4 && this.status==200){
             console.log('saved')
             populateRoomField()
+            if(document.getElementById("image").files[0] != null){
+                console.log("something is here")
+                submitMap(false);
+            }
             console.log(JSON.parse(this.response))
             changeRoom(JSON.parse(this.response))
         }

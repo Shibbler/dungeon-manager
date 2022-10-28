@@ -14,7 +14,7 @@ body(onload="init()")
     input#dungeonID(hidden value=`${dungeon._id}`)
     p Room Name (leave empty for untitled, will overwrite same-name files)  
         input#roomName(type="textbox" value= "new room")
-    button#saveRoomButton(type="button" onclick="saveRoom()") Save Room to Dungeon
+    button#saveRoomButton(type="button" onclick=`saveRoom()`) Save Room to Dungeon
     br
     br
     button#newRoomButton(type="button" onclick="newRoom()") Open New Room (will erase current data)
@@ -71,7 +71,7 @@ body(onload="init()")
             div#mapSubmit
             <label for="image">Upload Map</label>
             input(type="file" id="image" name="image" value="" required)
-            <button type="button" onclick="submitMap()">Submit Map</button>                                
+            <button type="button" onclick="submitMap(true)">Submit Map</button>                                
 
             div#mapDisplay
                 p No Map for this room
