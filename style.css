@@ -138,18 +138,55 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     width: 65%;
   }
 
+.actions{
+  border-radius: 25px;
+      background: #62a0a8;
+      padding: 10px;
+    width: 50%
+}
+.legendaryActions{
+  border-radius: 25px;
+      background: #cfa635;
+      padding: 10px;
+    width: 50%
+}
+.specialAbilities{
+  border-radius: 25px;
+      background: #69a37c;
+      padding: 10px;
+    width: 50%
+}
+.miscAttributes{
+  border-radius: 25px;
+      background: #9e7575;
+      padding: 10px;
+    width: 50%
+}
 
-/*
-  li{color: #C38d9e}
-  ul{color: #C38d9e}
+.numericStats{
+  border-radius: 25px;
+      background: #b96a45;
+      padding: 10px;
+    width: 50%
+}
 
-  body {
-    margin: 0;
-    color: #E27d60;
-    background: #Cafafe;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-      sans-serif;
-    
-  }
-  */
+.abilityScores{
+  border-radius: 25px;
+      background: #886fb1;
+      padding: 10px;
+    width: 50%
+}
+
+.savingThrows{
+  border-radius: 25px;
+      background: #74b16f;
+      padding: 10px;
+    width: 50%
+}
+
+.modifiers{
+  border-radius: 25px;
+      background: #b87676;
+      padding: 10px;
+    width: 50%
+}

@@ -3,12 +3,12 @@ link(rel='stylesheet', href='/style.css')
 script(src="/dungeonViewer.js") 
 head
     title Manage Dungeon
-h1= `Manage Dungeon: ${dungeon.name}, id: ${dungeon._id}`
-h2(id= 'currentRoomName') Current Room: New Room
-hr
 a(href='/') Home
 br
-br
+a(href='/create') Add new Monster to Vault
+hr
+h1= `Manage Dungeon: ${dungeon.name}, id: ${dungeon._id}`
+h2(id= 'currentRoomName') Current Room: New Room
 meta(name="DungeonIDMeta" content=`${dungeon._id}`)
 body(onload="init()")
     input#dungeonID(hidden value=`${dungeon._id}`)

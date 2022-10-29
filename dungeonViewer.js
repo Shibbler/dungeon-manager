@@ -251,7 +251,7 @@ function allowDrop(ev) {
 
     //console.log(data)
     //ev.target.appendChild(document.getElementById(data));
-    newItem = `<div class="monsterInRoom" id="${data+(Math.random() * 1000)}" name="${monsterData.getAttribute("name")}" hp = "${monsterData.getAttribute("hp")}" cr="${monsterData.getAttribute("cr")}"  draggable="true" ondragstart="drag(event)"> ${document.getElementById(data).textContent} </div><br>`
+    newItem = `<div class="monsterInRoom" id="${data+(Math.random() * 1000)}" name="${monsterData.getAttribute("name")}" hp = "${monsterData.getAttribute("hp")}" cr="${monsterData.getAttribute("cr")}"  draggable="true" ondragstart="drag(event)"> ${document.getElementById(data).textContent.replace("More Info",'')} </div><br>`
     ev.target.innerHTML += newItem
     calculateRoomStats()
   }

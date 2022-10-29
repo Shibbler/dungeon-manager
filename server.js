@@ -67,7 +67,7 @@ app.get('/', serveHome);
 app.get('/map',serveMap)
 app.get('/main', serveMainViewer)
 app.get('/monsters', findMonsters)
-
+app.get('/monsters/:monsterID',serveSpecificMonster)
 app.get('/rooms',sendRooms)
 app.get('/room',sendSpecificRoom)
 app.get('/dungeons',sendDungeons)
@@ -93,6 +93,16 @@ app.post("/create",insertCreation)
 
 app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
+
+
+function serveSpecificMonster(req,res,next){
+  //console.log(req.params.monsterID)
+  Monsters.findOne({"_id":ObjectId(req.params.monsterID)},function(err,result){
+    if (result === null || err) console.log("monster not found")
+    else res.render('specificMonster.pug',{monster:result})
+  })
+
+}
 
 
 function deleteRoom(req,res,next){
@@ -279,7 +289,7 @@ function sendRooms(req,res,next){
       if (result.rooms.length){
         const roomPromises = result.rooms.map( async (room) =>{
           let roomResult = await Rooms.findOne({"_id": ObjectId(room._id)})
-          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}<button onclick="deleteRoom(event,'${roomResult._id}','${roomResult.name}')">Delete Room</button></div><br>`
+          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}<br><br><button onclick="deleteRoom(event,'${roomResult._id}','${roomResult.name}')">Delete Room</button></div><br>`
           return roomResult;
         })
         Promise.all(roomPromises).then((data)=>{
@@ -539,7 +549,7 @@ function findMonsters(req,res,next){
       //let htmlToSend = ``;
       for (i = 0; i < results.length; i++){
         monster = results[i];
-        htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</div><br>`
+        htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}<a target="_blank" class = "monsterLink"  href='/monsters/${monster._id}'>More Info</a></div><br>`
       }
       res.status(200).send(htmlToSend);
      
@@ -555,7 +565,7 @@ function findMonsters(req,res,next){
        // console.log("I will send some html now")
         for (i = 0; i < results.length; i++){
           monster = results[i];
-          htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}</div><br>`
+          htmlToSend += `<div class="monsterDiv" id="${monster._id+(Math.random() * 1000)}" name= "${monster.name}" hp="${monster.hit_points}" cr="${monster.challenge_rating}" draggable="true" ondragstart="drag(event)"> Name: ${monster.name}, Size: ${monster.size}, HP: ${monster.hit_points}, CR: ${monster.challenge_rating}<br><a target="_blank" class = "monsterLink" href='/monsters/${monster._id}'>More Info</a></div><br>`
         }
         res.status(200).send(htmlToSend)
       }
