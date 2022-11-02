@@ -22,56 +22,58 @@ div(class='abilityScores')#abilityScores
     p=`Intelligence: ${monster.intelligence}`
     p=`Wisdom: ${monster.wisdom}`
     p=`Charisma: ${monster.charisma}`
-br
-div(class='savingThrows')#savingThrows
-    if(monster.strength_save ||monster.dexterity_save||monster.constitution_save||monster.intelligence_save||monster.wisdom_save|| monster.charisma_save)
+if(monster.strength_save ||monster.dexterity_save||monster.constitution_save||monster.intelligence_save||monster.wisdom_save|| monster.charisma_save)
+    br
+    div(class='savingThrows')#savingThrows
         h3 Saving Throws
-    if(monster.strength_save)
-        p=`Strength Saving throw: ${monster.strength_save}`
-    if(monster.dexterity_save)
-        p=`Dexterity Saving throw: ${monster.dexterity_save}`
-    if(monster.constitution_save)
-        p=`Constitution Saving throw: ${monster.constitution_save}`
-    if(monster.intelligence_save)
-        p=`Intelligence Saving throw: ${monster.intelligence_save}`
-    if(monster.wisdom_save)
-        p=`Wisdom Saving throw: ${monster.wisdom_save}`
-    if(monster.charisma_save)
-        p=`Charisma Saving throw: ${monster.charisma_save}`
-    
-br
-div(class='modifiers')#modifiers
-    if (monster.damage_vulnerabilities ||monster.damage_immunities|| monster.condition_immunities)
+        if(monster.strength_save)
+            p=`Strength Saving throw: ${monster.strength_save}`
+        if(monster.dexterity_save)
+            p=`Dexterity Saving throw: ${monster.dexterity_save}`
+        if(monster.constitution_save)
+            p=`Constitution Saving throw: ${monster.constitution_save}`
+        if(monster.intelligence_save)
+            p=`Intelligence Saving throw: ${monster.intelligence_save}`
+        if(monster.wisdom_save)
+            p=`Wisdom Saving throw: ${monster.wisdom_save}`
+        if(monster.charisma_save)
+            p=`Charisma Saving throw: ${monster.charisma_save}`
+if (monster.damage_vulnerabilities ||monster.damage_immunities|| monster.condition_immunities)
+    br
+    div(class='modifiers')#modifiers
         h3 Damage and Condition Modifiers
-    if(monster.damage_vulnerabilities)
-        p=`Damage vulnerabilities: ${monster.damage_vulnerabilities}`
-    if(monster.damage_immunities)
-        p=`Damage immunities: ${monster.damage_immunities}`
-    if(monster.condition_immunities)
-        p=`Condition immunities: ${monster.condition_immunities}`
+        if(monster.damage_vulnerabilities)
+            p=`Damage vulnerabilities: ${monster.damage_vulnerabilities}`
+        if(monster.damage_immunities)
+            p=`Damage immunities: ${monster.damage_immunities}`
+        if(monster.condition_immunities)
+            p=`Condition immunities: ${monster.condition_immunities}`
     
-br
-div(class='specialAbilities')#specialAbilities
-    if(monster.special_abilities)
+if(monster.special_abilities)
+    br
+    div(class='specialAbilities')#specialAbilities
         h3 Special Abilities
         for ability in monster.special_abilities
             div#ability
                 p=`${ability.name}: ${ability.desc}`
-br
-div(class='actions')#actions
-    if(monster.actions)
+
+if(monster.actions)
+    br
+    div(class='actions')#actions
         h3 Actions
         for action in monster.actions
             div#action
                 p=`${action.name}: ${action.desc}`
-br
-div(class='legendaryActions')#legendaryActions
-    if(monster.legendary_actions)
+                
+if(monster.legendary_actions)
+    br
+    div(class='legendaryActions')#legendaryActions
         h3 Legendary Actions
         for action in monster.legendary_actions
             div#legendaryAction
                 p=`${action.name}: ${action.desc}`
 br
+
 div(class='miscAttributes')#miscAttributes 
     h3 Other Attributes
     p=`Size: ${monster.size}`
