@@ -267,11 +267,19 @@ function makeNewDungeon(req,res,next){
       console.log(result.insertedId)
       //add the dungeon id to the user's dungeons
       Users.updateOne({username: user}, {$push: {"dungeons": result.insertedId}},function(err,results){
-        //res.redirect(`/dungeons/${result.insertedId}`)
-        //CALL FUNC DIRECTLY W/O REDIRECT
-        //sendSpecificDungeonNew(dungeonToInsert)
-        //res.render('mainView.pug',{session: req.session, dungeon: dungeonToInsert})
-        res.redirect(`/dungeons/${result.insertedId}`)
+        let firstRoom ={
+          user: user,
+          dungeon: result.insertedId,
+          monsters: [],
+          name: "new room"
+        }
+        Rooms.insertOne(firstRoom,function(err,roomResult){
+          console.log('I saved first room')
+          //need to update dungeons list
+          Dungeons.updateOne({"_id": ObjectId(result.insertedId)}, {$push:{"rooms": roomResult.insertedId}},function(err,resultUpdate){
+            res.redirect(`/dungeons/${result.insertedId}`)
+          })
+        });
       })
     }
   })
