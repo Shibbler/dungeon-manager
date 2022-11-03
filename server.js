@@ -2,6 +2,7 @@
 const pug = require('pug');
 const mongoose = require("mongoose");
 let mongo = require('mongodb');
+let crypto = require('crypto')
 const path = require("path");
 let MongoClient = mongo.MongoClient;
 mongoose.connect('mongodb://localhost/dungeonManager', {useNewUrlParser: true});
@@ -264,12 +265,13 @@ function makeNewDungeon(req,res,next){
       res.status(422)
     }else{
       console.log('dungeon added')
-      console.log(result.insertedId)
+      
       //add the dungeon id to the user's dungeons
+      console.log(result.insertedId.toString())
       Users.updateOne({username: user}, {$push: {"dungeons": result.insertedId}},function(err,results){
         let firstRoom ={
           user: user,
-          dungeon: result.insertedId,
+          dungeon: result.insertedId.toString(),
           monsters: [],
           name: "new room"
         }
@@ -284,6 +286,52 @@ function makeNewDungeon(req,res,next){
     }
   })
 }
+
+
+function saveRoomData(req,res,next){
+  //console.log(req.body)
+  console.log(req.body.roomName)
+  if (!req.body.roomName){
+    roomName = 'untitled'
+  }else{
+    roomName = req.body.roomName
+  }
+  let roomToSave ={
+    user: req.session.username,
+    dungeon: req.body.dungeon,
+    monsters: req.body.monsters,
+    name: roomName
+  }
+  console.log('about to look for room')
+  console.dir({roomToSave})
+  Rooms.findOne({name: roomName, user: req.session.username, dungeon: req.body.dungeon}, function(err,result){
+    console.log(result)
+    if (err){
+      console.log(err)
+    }
+    if(result === null){//room was not found so we need to insert it
+      Rooms.insertOne(roomToSave,function(err,result){
+        console.log('I saved')
+        //need to update dungeons list
+        Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)}, {$push:{"rooms": result.insertedId}})
+        res.status(200).send(JSON.stringify(result.insertedId));
+      });
+      
+    }
+    //room already does exist, so we need to replace/update it
+    else{
+      Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
+      console.log("I replaced")
+      //no need to update dungeons
+      res.status(200).send(JSON.stringify(result._id));
+    }
+
+  })
+  //console.log("roomSaved")
+}
+
+
+
 
 function sendRooms(req,res,next){
     console.log(req.query.dungeonID)
@@ -391,7 +439,7 @@ function serveRegisterPage(req,res,next){
 
 function register(req,res,next){
   let username = req.body.username.toLowerCase();
-	let password = req.body.password;
+	let password = crypto.createHash('md5').update(req.body.password).digest("hex");
 
   Users.findOne({"username":username}, function(err,result){
     if (result != null){//if a user is found
@@ -427,7 +475,7 @@ function login(req,res,next){
   }
 
   let username = req.body.username;
-  let password = req.body.password;
+  let password = crypto.createHash('md5').update(req.body.password).digest("hex");
   //console.log("Logging in with credentials:");
   //console.log("Username: " + req.body.username);
   //console.log("Password: " + req.body.password);
@@ -442,7 +490,7 @@ function login(req,res,next){
       currUser = result;
           //console.log(currUser)
           //if passwords match
-          if(currUser.password === req.body.password){
+          if(currUser.password === password){
               req.session.loggedin = true;
               //We set the username associated with this session
               //On future requests, we KNOW who the user is
@@ -469,50 +517,6 @@ function logout(req,res,next){
         res.render("home.pug", {session: req.session})
 	}
 
-}
-
-
-//INCOMPLETE
-function saveRoomData(req,res,next){
-  //console.log(req.body)
-  console.log(req.body.roomName)
-  if (!req.body.roomName){
-    roomName = 'untitled'
-  }else{
-    roomName = req.body.roomName
-  }
-  let roomToSave ={
-    user: req.session.username,
-    dungeon: req.body.dungeon,
-    monsters: req.body.monsters,
-    name: roomName
-  }
-  console.log('about to look for room')
-  console.dir({roomToSave})
-  Rooms.findOne({name: roomName, user: req.session.username, dungeon: req.body.dungeon}, function(err,result){
-    console.log(result)
-    if (err){
-      console.log(err)
-    }
-    if(result === null){//room was not found so we need to insert it
-      Rooms.insertOne(roomToSave,function(err,result){
-        console.log('I saved')
-        //need to update dungeons list
-        Dungeons.updateOne({"_id": ObjectId(req.body.dungeon)}, {$push:{"rooms": result.insertedId}})
-        res.status(200).send(JSON.stringify(result.insertedId));
-      });
-      
-    }
-    //room already does exist, so we need to replace/update it
-    else{
-      Rooms.replaceOne({"_id": ObjectId(result._id)}, roomToSave)
-      console.log("I replaced")
-      //no need to update dungeons
-      res.status(200).send(JSON.stringify(result._id));
-    }
-
-  })
-  //console.log("roomSaved")
 }
 
 

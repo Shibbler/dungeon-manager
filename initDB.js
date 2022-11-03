@@ -53,7 +53,7 @@ MongoClient.connect("mongodb://localhost:27017/", function(err, client) {
 						throw err;
 					}
 					
-					console.log(result.insertedCount + " monsters successfully added (should be 326).");
+					console.log(result.insertedCount + " monsters successfully added (should be 325).");
 					client.close();
 				});
 			}
