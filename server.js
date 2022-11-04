@@ -157,7 +157,7 @@ function serveCreationPage(req,res,next){
 
 function insertCreation(req,res,next){
   //ensure numbers
-  if (isNaN(req.body.hp) || isNaN(req.body.cr) || isNaN(req.body.ac)){
+  if (isNaN(req.body.hp) || isNaN(req.body.cr) || isNaN(req.body.ac)|| isNaN(req.body.strength)|| isNaN(req.body.dexterity) || isNaN(req.body.constitution) || isNaN(req.body.intelligence) || isNaN(req.body.wisdom) || isNaN(req.body.charisma)){
     res.render('create.pug',{errorName: false, errorNaN: true})
     return;
   }
@@ -169,11 +169,17 @@ function insertCreation(req,res,next){
     else{
       let monsterToInsert = {
         name: req.body.name,
-        armor_class: req.body.ac,
+        strength: Number(req.body.strength),
+        dexterity: Number(req.body.dexterity),
+        constitution: Number(req.body.constitution),
+        intelligence: Number(req.body.intelligence),
+        wisdom: Number(req.body.wisdom),
+        charisma: Number(req.body.charisma),
+        armor_class: Number(req.body.ac),
         size: req.body.size,
         type: req.body.type,
         subtype: req.body.subtype,
-        hit_points: req.body.hp,
+        hit_points: Number(req.body.hp),
         alignment: req.body.alignment,
         damage_vulnerabilities: req.body.damage_vulnerabilities,
         damage_resistances: req.body.damage_resistances,

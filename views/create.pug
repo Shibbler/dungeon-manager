@@ -35,11 +35,11 @@ form(action='/create' method="post")
         br
         br
         label(for='size') Size          
-        input(type="text" id = "size" name= "size")
+        input(type="text" id = "size" name= "size" required)
         br
         br
         label(for='type') Type          
-        input(type="text" id = "type" name= "type")
+        input(type="text" id = "type" name= "type" required)
         br
         br
         label(for='subtype') Subtype      
@@ -47,11 +47,35 @@ form(action='/create' method="post")
         br
         br
         label(for='alignment') Alignment       
-        input(type="text" id = 'alignment' name= "alignment")
+        input(type="text" id = 'alignment' name= "alignment" required)
         br
         br
         label(for='languages') Languages   
         input(type="text" id = 'languages' name= "languages")
+        br
+        br
+        label(for='strength') Strength    
+        input(type="text" id = 'strength' name= "strength" required)
+        br
+        br
+        label(for='dexterity') Dexterity    
+        input(type="text" id = 'dexterity' name= "dexterity" required)
+        br
+        br
+        label(for='constitution') Constitution    
+        input(type="text" id = 'constitution' name= "constitution" required)
+        br
+        br
+        label(for='intelligence') Intelligence    
+        input(type="text" id = 'intelligence' name= "intelligence" required)
+        br
+        br
+        label(for='wisdom') Wisdom    
+        input(type="text" id = 'wisdom' name= "wisdom" required)
+        br
+        br
+        label(for='charisma') Charisma    
+        input(type="text" id = 'charisma' name= "charisma" required)
         br
         br
         label(for='damage_vulnerabilities') Damage Vulnerabilities    

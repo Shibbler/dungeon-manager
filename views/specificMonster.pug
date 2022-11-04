@@ -11,8 +11,10 @@ div(class='numericStats')#numericStats
     p=`Challenge Rating: ${monster.challenge_rating}`
     p=`Armour Class: ${monster.armor_class}`
     p=`Hit Points: ${monster.hit_points}`
-    p=`Hit Dice: ${monster.hit_dice}`
-    p=`Speed: ${monster.speed}`
+    if (monster.hit_dice)
+        p=`Hit Dice: ${monster.hit_dice}`
+    if (monster.speed)
+        p=`Speed: ${monster.speed}`
 br
 div(class='abilityScores')#abilityScores
     h3 Ability Scores
@@ -81,4 +83,8 @@ div(class='miscAttributes')#miscAttributes
     if (monster.subtype)
         p=`Subtype: ${monster.subtype}`
     p=`Alignment: ${monster.alignment}`
-    p=`Senses: ${monster.senses}`
+    if (monster.senses)
+        p=`Senses: ${monster.senses}`
+    if (monster.languages)
+        p=` Languages: ${monster.languages}`
+    
