@@ -127,6 +127,7 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     grid-area: monsterDisplay;
     overflow:auto;
     background: #c48449;
+    max-height: 300px;
   }
   
   .vaultDisplay { 
@@ -139,7 +140,7 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     border-radius: 10%;               
   }
   
-  .currentMapDisplay { grid-area: currentMapDisplay; overflow: auto; }
+  .currentMapDisplay { grid-area: currentMapDisplay; overflow: auto;}
 
   .column {
     float: left;
