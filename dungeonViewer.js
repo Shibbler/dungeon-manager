@@ -7,6 +7,21 @@ function init(){
     
 }
 
+function renameRoom(event,roomToChange){
+    event.stopPropagation();
+    let req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+		if(this.readyState==4 && this.status==200){
+            console.log(this.reponse)
+            changeRoom(this.response)
+            populateRoomField()
+        }
+	}
+    newName = prompt("What would you like to change the name to?")
+    req.open("POST", `/roomNameChange`);
+    req.setRequestHeader("Content-Type", "application/json")
+	req.send(JSON.stringify({newName: newName, roomToChange: roomToChange,dungeon: document.getElementById('dungeonID').value,curName: document.getElementById("roomName").value}));
+}
 
 function deleteRoom(event,id,name){
     if (name === document.getElementById("roomName").value){

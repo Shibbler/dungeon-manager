@@ -91,9 +91,26 @@ app.post("/login",login)
 app.get("/logout",logout)
 app.get("/create",serveCreationPage)
 app.post("/create",insertCreation)
+app.post('/roomNameChange',changeRoomName)
 
 app.post('/map',upload.single('image'),uploadPictureToDB)
 app.post('/roomSave',saveRoomData)
+
+
+function changeRoomName(req,res,next){
+  Rooms.updateOne({"_id": ObjectId(req.body.roomToChange)},{$set: {name: req.body.newName}},function(err,result){
+    if (err) console.log(err)
+    else{
+      //need to also update img file or its not going to show up
+      imgModel.updateOne({room: req.body.curName,dungeon: ObjectId(req.body.dungeon)},{$set: {room:req.body.newName}},function(err,result){
+        if (err) console.log(err)
+        else{
+          res.status(200).send(req.body.roomToChange)
+        }
+      })
+    }
+  })
+}
 
 
 function serveSpecificMonster(req,res,next){
@@ -104,7 +121,6 @@ function serveSpecificMonster(req,res,next){
   })
 
 }
-
 
 function deleteRoom(req,res,next){
   //delete the room from the dungeon
@@ -345,7 +361,7 @@ function sendRooms(req,res,next){
       if (result.rooms.length){
         const roomPromises = result.rooms.map( async (room) =>{
           let roomResult = await Rooms.findOne({"_id": ObjectId(room._id)})
-          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}<br><br><button onclick="deleteRoom(event,'${roomResult._id}','${roomResult.name}')">Delete Room</button></div><br>`
+          htmlToSend+= `<div id="${roomResult._id}" class="roomDiv" onclick="changeRoom('${roomResult._id}')" ondrop="dropRoom(event,'${roomResult._id}','${roomResult.name}')" ondragover="allowDrop(event)" name="${roomResult.name}" onclick="changeRoom('${roomResult._id}')">Room: ${roomResult.name}  <button class="renameButton" onclick="renameRoom(event,'${roomResult._id}')">Rename Room</button><br><button onclick="deleteRoom(event,'${roomResult._id}','${roomResult.name}')">Delete Room</button></div><br>`
           return roomResult;
         })
         Promise.all(roomPromises).then((data)=>{
