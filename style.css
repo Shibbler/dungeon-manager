@@ -93,6 +93,14 @@ html {background-color: #e9d1ad;font-family: -apple-system, BlinkMacSystemFont, 
     height: 75px;
   }
 
+  .currentRoomClass{
+    border-radius: 25px;
+    background: #b35ebb;
+    padding: 10px;
+    width: 90%;
+    height: 75px;
+  }
+
   .monsterDiv{
     border-radius: 25px;
       background: #b85858;

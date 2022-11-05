@@ -1,4 +1,6 @@
 
+currentRoomId=""
+
 function init(){
 	//console.log("ya got me")
     calculateRoomStats();
@@ -93,6 +95,7 @@ function newRoom(){
     document.getElementById('monsterDisplay').innerHTML = '<div id="roomStats"></div>'
     document.getElementById("mapDisplay").innerHTML = "No Map for this room"
     calculateRoomStats()
+    unHighlightRoom(currentRoomId)
 }
 
 
@@ -114,10 +117,24 @@ function loadRoomData(data){
     }
     document.getElementById('monsterDisplay').innerHTML = newHtml
     calculateRoomStats()
-
-    
+    highlightRoom(room._id)
+    currentRoomId = room._id
 }
 
+function highlightRoom(roomID){
+    console.log(roomID)
+    if (roomID !=""){
+        document.getElementById(roomID).classList.add("currentRoomClass")
+        document.getElementById(roomID).classList.remove("roomDiv")
+    }
+}
+
+function unHighlightRoom(roomID){
+    if (roomID != ""){
+        document.getElementById(roomID).classList.add("roomDiv")
+        document.getElementById(roomID).classList.remove("currentRoomClass")
+    }
+}
 
 function populateRoomField(){
     console.log("calling for room data")
@@ -138,6 +155,7 @@ function populateRoomField(){
 
 function changeRoom(id){
     //console.log('id')
+    unHighlightRoom(currentRoomId)
     let req = new XMLHttpRequest();
     //read html data and update page accordingly.
 	req.onreadystatechange = function() {
@@ -347,6 +365,7 @@ function saveRoom(){
             }
             console.log(JSON.parse(this.response))
             changeRoom(JSON.parse(this.response))
+            highlightRoom(currentRoomId)
         }
 	}
     let monstersInRoom = document.getElementById("monsterDisplay").getElementsByClassName("monsterInRoom");
