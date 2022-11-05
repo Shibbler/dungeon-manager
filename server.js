@@ -230,6 +230,9 @@ function serveMap(req,res,next){
 function uploadPictureToDB(req,res,next){
   console.log("picture upload")
   //create the image to upload
+  if (process.platform === "darwin"){
+    console.log("its mac")
+  }
   fileName = path.join(__dirname + '/uploads/' + req.file.filename)
   console.log(req.body.roomName)
   console.log(req.body.dungeon)
@@ -655,3 +658,4 @@ function sendCSS(req,res,next){
 
 app.listen(3000);
 console.log("Server listening on port 3000");
+console.log(process.platform)
