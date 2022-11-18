@@ -32,14 +32,14 @@ const { assert } = require('console');
 let testDungeon = {name: 'test', _id: 'TEST ID'}
 
 
-//define the store for mongo stored session data
+//define the store for mongo stored session data, taken from Dave McKenney's Tutorial Code for COMP2406, Fall 2021.
 const MongoDBStore = require('connect-mongodb-session')(session);
 let store = new MongoDBStore({
     uri: 'mongodb://localhost:27017/connect_mongodb_session_test',
     collection: 'mySessions'
   });
 
-
+//taken from https://www.geeksforgeeks.org/upload-and-retrieve-image-on-mongodb-using-mongoose/
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
       cb(null, 'uploads')
@@ -261,7 +261,12 @@ function uploadPictureToDB(req,res,next){
     }
     else {
         //delete the file so it only stored on mongo
-        fs.unlinkSync(fileName)
+        fs.unlinkSync(fileName,function(err){
+          if (err){
+            throw err;
+            console.log(err)
+          }
+        })
         //send something to code
         //temp sol'n rn
         //console.log(item.img.contentType)
