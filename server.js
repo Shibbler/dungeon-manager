@@ -261,12 +261,8 @@ function uploadPictureToDB(req,res,next){
     }
     else {
         //delete the file so it only stored on mongo
-        fs.unlinkSync(fileName,function(err){
-          if (err){
-            throw err;
-            console.log(err)
-          }
-        })
+        //fs.unlinkSync(fileName)
+
         //send something to code
         //temp sol'n rn
         //console.log(item.img.contentType)
